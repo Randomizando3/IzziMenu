@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IzziMenu | Gestão de Pedidos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#ccd4ee",
+              "outline-variant": "#a9b4b9",
+              "error": "#9f403d",
+              "on-error-container": "#752121",
+              "on-primary-fixed": "#373f54",
+              "on-secondary-container": "#455367",
+              "on-secondary-fixed": "#324053",
+              "on-tertiary-fixed-variant": "#55536f",
+              "on-primary": "#f7f7ff",
+              "primary": "#565e74",
+              "secondary-dim": "#465468",
+              "on-tertiary": "#fcf7ff",
+              "on-tertiary-container": "#4b4a65",
+              "error-dim": "#4e0309",
+              "secondary-container": "#d5e3fc",
+              "surface-container-lowest": "#ffffff",
+              "surface-tint": "#565e74",
+              "error-container": "#fe8983",
+              "on-error": "#fff7f6",
+              "secondary-fixed-dim": "#c7d5ed",
+              "inverse-primary": "#dae2fd",
+              "surface": "#f7f9fb",
+              "surface-bright": "#f7f9fb",
+              "tertiary-dim": "#52506b",
+              "outline": "#717c82",
+              "on-tertiary-fixed": "#393751",
+              "primary-container": "#dae2fd",
+              "primary-fixed": "#dae2fd",
+              "on-primary-fixed-variant": "#535b71",
+              "surface-container-low": "#f0f4f7",
+              "tertiary-fixed": "#dad6f7",
+              "background": "#f7f9fb",
+              "surface-variant": "#d9e4ea",
+              "surface-container": "#e8eff3",
+              "on-surface": "#2a3439",
+              "on-background": "#2a3439",
+              "surface-container-high": "#e1e9ee",
+              "tertiary": "#5e5c78",
+              "inverse-surface": "#0b0f10",
+              "on-secondary": "#f8f8ff",
+              "surface-dim": "#cfdce3",
+              "inverse-on-surface": "#9a9d9f",
+              "tertiary-fixed-dim": "#ccc9e9",
+              "secondary-fixed": "#d5e3fc",
+              "secondary": "#526074",
+              "surface-container-highest": "#d9e4ea",
+              "primary-dim": "#4a5268",
+              "on-surface-variant": "#566166",
+              "on-secondary-fixed-variant": "#4e5c71",
+              "on-primary-container": "#4a5167",
+              "tertiary-container": "#dad6f7"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        vertical-align: middle;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      h1, h2, h3, .brand-font {
+        font-family: 'Manrope', sans-serif;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container">
+<div class="flex min-h-screen">
+<!-- SideNavBar Component -->
+<aside class="hidden md:flex flex-col p-4 space-y-2 h-screen w-64 fixed left-0 top-0 bg-[#f0f4f7] dark:bg-slate-800 z-40">
+<div class="flex items-center gap-3 px-2 mb-8 mt-2">
+<div class="w-10 h-10 bg-primary rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<div>
+<p class="text-lg font-black text-[#2a3439] dark:text-white leading-tight">Painel da Loja</p>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Operação do Restaurante</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 font-inter text-sm font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Resumo</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 bg-[#ffffff] dark:bg-slate-700 text-[#2a3439] dark:text-white rounded-lg shadow-sm font-inter text-sm font-medium translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">package_2</span>
+<span>Pedidos</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 font-inter text-sm font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span>Mapa ao Vivo</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 font-inter text-sm font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span>Expedição</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 font-inter text-sm font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Entregadores</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 font-inter text-sm font-medium transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Relatórios</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 font-inter text-sm font-medium transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Ajuda</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 font-inter text-sm font-medium transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Configurações</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 pb-20 md:pb-0">
+<!-- TopAppBar Component -->
+<header class="flex justify-between items-center w-full px-8 h-16 bg-[#f7f9fb] dark:bg-slate-900 sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<h1 class="text-xl font-bold text-[#2a3439] dark:text-white tracking-tighter brand-font">IzziMenu</h1>
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-[#566166] dark:text-slate-400 hover:text-[#2a3439] font-manrope text-sm font-semibold tracking-tight transition-colors" href="#">Visão Geral</a>
+<a class="text-[#565e74] dark:text-white border-b-2 border-[#565e74] pb-1 font-manrope text-sm font-semibold tracking-tight" href="#">Pedidos</a>
+<a class="text-[#566166] dark:text-slate-400 hover:text-[#2a3439] font-manrope text-sm font-semibold tracking-tight transition-colors" href="#">Cardápio</a>
+<a class="text-[#566166] dark:text-slate-400 hover:text-[#2a3439] font-manrope text-sm font-semibold tracking-tight transition-colors" href="#">Fleet</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-[#f0f4f7] border-none text-sm rounded-full pl-10 pr-4 py-1.5 w-64 focus:ring-1 focus:ring-primary" placeholder="Buscar pedidos..." type="text"/>
+</div>
+<button class="p-2 text-[#565e74] hover:bg-[#f0f4f7] rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="professional headshot of a logistics administrator in a clean modern office setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkZryck5i6g-KJ8UDQ57JE5BnqkIY8l9tM0sMfFRShnrTiDhc3JbLDmzI0PucnMVwXMvTDDPiKVBgHspWvrUenzsn9J7xpWZGAUG4hZS9C3HNFb_slZxW2LQj4es2l1_TwPCdSO-riOH61ZgceB7yCO3AqPltWcqS67H1sZnQ3YAzaX1QcKODQfxGPznEN5yIfbXRjBc0LIr1cFhnla_yZSUT5rJJAFw_J4BxMTgkisp7KZchIeo7BoOZye2uNxthaQMwG0aC41g"/>
+</div>
+</div>
+</header>
+<!-- Order Management Canvas -->
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Header Actions -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h2 class="text-3xl font-extrabold text-on-surface tracking-tight mb-1">Gestão de Pedidos</h2>
+<p class="text-on-surface-variant font-medium">Monitoring 24 active deliveries in real-time.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low text-on-surface font-semibold text-sm rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-lg">print</span>
+                            Relatório
+                        </button>
+<button class="flex items-center gap-2 px-6 py-2 bg-primary text-on-primary font-bold text-sm rounded shadow-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-lg">add</span>
+                            Novo Pedido
+                        </button>
+</div>
+</div>
+<!-- Filters Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+<div class="lg:col-span-3 bg-surface-container-low p-1 rounded-xl flex overflow-x-auto no-scrollbar">
+<button class="flex-1 px-4 py-2.5 text-sm font-bold bg-white text-on-surface rounded-lg shadow-sm whitespace-nowrap">Todos</button>
+<button class="flex-1 px-4 py-2.5 text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">Novo</button>
+<button class="flex-1 px-4 py-2.5 text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">Em Preparo</button>
+<button class="flex-1 px-4 py-2.5 text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">Saiu para Entrega</button>
+<button class="flex-1 px-4 py-2.5 text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">Concluído</button>
+<button class="flex-1 px-4 py-2.5 text-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap">Cancelado</button>
+</div>
+<div class="bg-surface-container-low p-1 rounded-xl flex gap-1">
+<div class="flex-1 relative">
+<input class="w-full bg-transparent border-none text-xs font-bold text-on-surface-variant focus:ring-0 cursor-pointer h-10 px-2" type="date"/>
+</div>
+<div class="w-px h-6 self-center bg-outline-variant/30"></div>
+<button class="flex-1 flex items-center justify-center gap-1 text-xs font-bold text-on-surface-variant">
+<span class="material-symbols-outlined text-base">payments</span>
+                            Pagamento
+                        </button>
+</div>
+</div>
+<!-- Main Layout: List & Sidebar Detail -->
+<div class="flex flex-col xl:flex-row gap-8 items-start">
+<!-- Pedidos List (Asymmetric Content Area) -->
+<div class="flex-1 w-full space-y-3">
+<!-- Table Header -->
+<div class="grid grid-cols-6 px-6 py-3 bg-surface-container-high rounded-t-lg text-[10px] uppercase tracking-widest font-black text-on-surface-variant">
+<div class="col-span-2">Pedido / Cliente</div>
+<div class="text-center">Total</div>
+<div class="text-center">Tempo</div>
+<div class="text-center">Pagamento</div>
+<div class="text-right">Ações</div>
+</div>
+<!-- Order Row 1 -->
+<div class="grid grid-cols-6 items-center px-6 py-5 bg-surface-container-lowest hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="col-span-2 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center text-primary font-bold text-xs">#482</div>
+<div>
+<p class="font-bold text-on-surface">Ricardo Mendonça</p>
+<p class="text-xs text-on-surface-variant">2 Itens • Entrega em Casa</p>
+</div>
+</div>
+<div class="text-center">
+<p class="font-bold text-on-surface">R$ 142,50</p>
+</div>
+<div class="text-center">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-error-container/20 text-error font-bold text-[10px]">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                    42 min
+                                </div>
+</div>
+<div class="text-center">
+<span class="px-2.5 py-1 rounded text-[10px] font-black uppercase bg-secondary-container text-on-secondary-container">Pago (Online)</span>
+</div>
+<div class="text-right">
+<button class="p-2 rounded bg-surface-container hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Order Row 2 -->
+<div class="grid grid-cols-6 items-center px-6 py-5 bg-surface-container-low hover:bg-surface-container-high transition-colors group cursor-pointer border-l-4 border-primary">
+<div class="col-span-2 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary text-on-primary flex items-center justify-center font-bold text-xs shadow-sm">#483</div>
+<div>
+<p class="font-bold text-on-surface">Beatriz Silva</p>
+<p class="text-xs text-on-surface-variant">1 Item • Retirada</p>
+</div>
+</div>
+<div class="text-center">
+<p class="font-bold text-on-surface">R$ 58,00</p>
+</div>
+<div class="text-center">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary-container/30 text-secondary font-bold text-[10px]">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                    12 min
+                                </div>
+</div>
+<div class="text-center">
+<span class="px-2.5 py-1 rounded text-[10px] font-black uppercase bg-surface-container-highest text-on-surface-variant">Pendente</span>
+</div>
+<div class="text-right">
+<button class="p-2 rounded bg-surface-container hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Order Row 3 -->
+<div class="grid grid-cols-6 items-center px-6 py-5 bg-surface-container-lowest hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="col-span-2 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center text-primary font-bold text-xs">#484</div>
+<div>
+<p class="font-bold text-on-surface">Carlos Eduardo</p>
+<p class="text-xs text-on-surface-variant">4 Itens • Entrega em Casa</p>
+</div>
+</div>
+<div class="text-center">
+<p class="font-bold text-on-surface">R$ 215,90</p>
+</div>
+<div class="text-center">
+<div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-secondary-container/30 text-secondary font-bold text-[10px]">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                                    5 min
+                                </div>
+</div>
+<div class="text-center">
+<span class="px-2.5 py-1 rounded text-[10px] font-black uppercase bg-secondary-container text-on-secondary-container">Pago (Cartão)</span>
+</div>
+<div class="text-right">
+<button class="p-2 rounded bg-surface-container hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Detailed View Sidebar (Editorial Style) -->
+<aside class="w-full xl:w-96 bg-surface-container-lowest rounded-2xl shadow-[0_12px_32px_-4px_rgba(42,52,57,0.08)] overflow-hidden flex flex-col sticky top-24">
+<div class="p-6 border-b border-surface-container">
+<div class="flex items-center justify-between mb-4">
+<span class="px-3 py-1 rounded bg-primary text-on-primary text-[10px] font-black uppercase tracking-widest">Pedido #483</span>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-xl">print</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+</div>
+<h3 class="text-xl font-bold text-on-surface">Beatriz Silva</h3>
+<p class="text-sm text-on-surface-variant font-medium">(11) 98765-4321</p>
+</div>
+<div class="p-6 flex-1 space-y-6">
+<section>
+<p class="text-[10px] uppercase font-black text-on-surface-variant tracking-widest mb-3">Endereço de Entrega</p>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">location_on</span>
+<div>
+<p class="text-sm font-bold text-on-surface">Rua das Amoreiras, 142</p>
+<p class="text-xs text-on-surface-variant">Jardim Paulista, São Paulo - SP</p>
+<p class="text-xs font-semibold text-primary mt-1">Apt 42B - Tocar interfone</p>
+</div>
+</div>
+</section>
+<section>
+<p class="text-[10px] uppercase font-black text-on-surface-variant tracking-widest mb-3">Itens do Pedido</p>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm">
+<div class="flex items-center gap-3">
+<span class="w-6 h-6 rounded bg-surface-container-low flex items-center justify-center font-bold text-[10px]">1x</span>
+<span class="font-medium text-on-surface">Combo Premium Delivery</span>
+</div>
+<span class="font-bold">R$ 58,00</span>
+</div>
+<div class="ml-9 text-xs text-on-surface-variant space-y-1">
+<p>• Sem cebola</p>
+<p>• Batata frita extra crocante</p>
+</div>
+</div>
+</section>
+<div class="pt-6 border-t border-surface-container space-y-2">
+<div class="flex justify-between text-sm text-on-surface-variant">
+<span>Subtotal</span>
+<span>R$ 58,00</span>
+</div>
+<div class="flex justify-between text-sm text-on-surface-variant">
+<span>Taxa de Entrega</span>
+<span class="text-primary font-bold">Grátis</span>
+</div>
+<div class="flex justify-between text-lg font-black text-on-surface pt-2">
+<span>Total</span>
+<span>R$ 58,00</span>
+</div>
+</div>
+</div>
+<div class="p-6 bg-surface-container-low space-y-3">
+<p class="text-[10px] uppercase font-black text-on-surface-variant tracking-widest">Ação Rápida</p>
+<div class="flex gap-2">
+<button class="flex-1 bg-white border border-outline-variant/30 text-on-surface text-sm font-bold py-3 rounded hover:bg-surface-container-highest transition-colors">
+                                    Alterar Status
+                                </button>
+<button class="bg-primary text-on-primary p-3 rounded shadow-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 pb-safe bg-[#f7f9fb]/80 dark:bg-slate-900/80 backdrop-blur-md z-50 shadow-[0_-4px_12px_rgba(42,52,57,0.05)] border-t border-[#a9b4b9]/20">
+<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#565e74] dark:text-white scale-110" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">package_2</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Pedidos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="#">
+<span class="material-symbols-outlined">distance</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Track</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Account</span>
+</a>
+</nav>
+</div>
+</body></html>
