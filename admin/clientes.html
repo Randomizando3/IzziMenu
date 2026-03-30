@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clientes &amp; Campanhas | IzziMenu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-fixed-dim": "#ccd4ee",
+                        "outline-variant": "#a9b4b9",
+                        "error": "#9f403d",
+                        "on-error-container": "#752121",
+                        "on-primary-fixed": "#373f54",
+                        "on-secondary-container": "#455367",
+                        "on-secondary-fixed": "#324053",
+                        "on-tertiary-fixed-variant": "#55536f",
+                        "on-primary": "#f7f7ff",
+                        "primary": "#565e74",
+                        "secondary-dim": "#465468",
+                        "on-tertiary": "#fcf7ff",
+                        "on-tertiary-container": "#4b4a65",
+                        "error-dim": "#4e0309",
+                        "secondary-container": "#d5e3fc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "error-container": "#fe8983",
+                        "on-error": "#fff7f6",
+                        "secondary-fixed-dim": "#c7d5ed",
+                        "inverse-primary": "#dae2fd",
+                        "surface": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "tertiary-dim": "#52506b",
+                        "outline": "#717c82",
+                        "on-tertiary-fixed": "#393751",
+                        "primary-container": "#dae2fd",
+                        "primary-fixed": "#dae2fd",
+                        "on-primary-fixed-variant": "#535b71",
+                        "surface-container-low": "#f0f4f7",
+                        "tertiary-fixed": "#dad6f7",
+                        "background": "#f7f9fb",
+                        "surface-variant": "#d9e4ea",
+                        "surface-container": "#e8eff3",
+                        "on-surface": "#2a3439",
+                        "on-background": "#2a3439",
+                        "surface-container-high": "#e1e9ee",
+                        "tertiary": "#5e5c78",
+                        "inverse-surface": "#0b0f10",
+                        "on-secondary": "#f8f8ff",
+                        "surface-dim": "#cfdce3",
+                        "inverse-on-surface": "#9a9d9f",
+                        "tertiary-fixed-dim": "#ccc9e9",
+                        "secondary-fixed": "#d5e3fc",
+                        "secondary": "#526074",
+                        "surface-container-highest": "#d9e4ea",
+                        "primary-dim": "#4a5268",
+                        "on-surface-variant": "#566166",
+                        "on-secondary-fixed-variant": "#4e5c71",
+                        "on-primary-container": "#4a5167",
+                        "tertiary-container": "#dad6f7"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .glass-header {
+            background: rgba(247, 249, 251, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<header class="bg-[#f7f9fb] text-[#565e74] font-manrope text-sm font-semibold tracking-tight docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-8 h-16">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-[#2a3439] tracking-tighter">IzziMenu</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Visão Geral</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Pedidos</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Cardápio</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Fleet</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-64" placeholder="Buscar pedidos..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-[#565e74] hover:bg-[#f0f4f7] p-2 rounded-full transition-colors">notifications</button>
+<button class="material-symbols-outlined text-[#565e74] hover:bg-[#f0f4f7] p-2 rounded-full transition-colors">settings</button>
+<div class="h-8 w-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Admin Profile" data-alt="professional headshot of a logistics manager in a clean studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4Futwz6shz2T-dOEVi6q1eVwApAgsD_UAceQtgCT99SRz6vYYk3GF6lmkPtbP6QTTUNEp_r72Cw_aa5oFFj9icaZasVbqALmy5LFXACUU62N_oZxPtcb6Ce7VEV0gaaHDrbb2EYEBgcKZOChVgn8CZ1iD3IGoZBHnTTX8LNWxmUzGiE7bdNE3VwLfjYpRyCx1wPpcRTAzCxKJ2AREsQuOhY7YybLsyNnRnxuY6IoUJpXxr0Dn_sF3QXgAx4FLDiWrVwhCA8aJUQ"/>
+</div>
+</div>
+</header>
+<div class="flex min-h-[calc(100-4rem)]">
+<!-- SideNavBar -->
+<aside class="bg-[#f0f4f7] text-[#565e74] font-inter text-sm font-medium h-screen w-64 fixed left-0 top-0 pt-20 flex flex-col p-4 space-y-2 hidden lg:flex">
+<div class="mb-6 px-2">
+<h2 class="text-lg font-black text-[#2a3439]">Painel da Loja</h2>
+<p class="text-xs text-on-surface-variant">Operação do Restaurante</p>
+</div>
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
+<span class="material-symbols-outlined">dashboard</span> Resumo
+            </a>
+<a class="flex items-center gap-3 p-3 bg-[#ffffff] text-[#2a3439] rounded-lg shadow-sm translate-x-1" href="#">
+<span class="material-symbols-outlined">group</span> Customers
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
+<span class="material-symbols-outlined">local_shipping</span> Expedição
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
+<span class="material-symbols-outlined">analytics</span> Relatórios
+            </a>
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
+<span class="material-symbols-outlined">campaign</span> Campaigns
+            </a>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span> Novo Pedido
+                </button>
+<a class="flex items-center gap-3 p-3 mt-4 text-[#566166] hover:bg-[#d9e4ea] rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span> Ajuda
+                </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 p-8 bg-surface space-y-8 pb-24">
+<!-- Bento Visão Geral Header -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-surface-container-lowest p-6 rounded-xl shadow-[0_12px_32px_-4px_rgba(42,52,57,0.04)] flex justify-between items-center overflow-hidden relative">
+<div class="z-10">
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface">Customer Relations</h1>
+<p class="text-on-surface-variant mt-1">Manage 1,284 active relationships and growing.</p>
+<div class="flex gap-4 mt-6">
+<button class="px-5 py-2 bg-primary text-on-primary rounded font-semibold text-sm">Download Report</button>
+<button class="px-5 py-2 bg-surface-container-high text-on-surface rounded font-semibold text-sm">View Relatórios</button>
+</div>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10">
+<span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'FILL' 1;">diversity_3</span>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-6 rounded-xl shadow-lg relative overflow-hidden flex flex-col justify-center">
+<p class="text-primary-fixed-dim text-xs uppercase tracking-widest font-bold">Active Campaigns</p>
+<h3 class="text-4xl font-black mt-2">04</h3>
+<p class="text-sm mt-4 opacity-80">Next scheduled: <span class="font-bold">Weekend Special</span></p>
+<div class="absolute top-4 right-4 h-12 w-12 bg-white/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">send</span>
+</div>
+</div>
+</section>
+<!-- Main Layout Split -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+<!-- Customer List (Left Col) -->
+<div class="xl:col-span-8 space-y-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex bg-surface-container-high p-1 rounded-lg w-fit">
+<button class="px-4 py-1.5 rounded-md bg-surface-container-lowest shadow-sm text-sm font-bold text-on-surface">All</button>
+<button class="px-4 py-1.5 rounded-md text-sm font-medium text-on-surface-variant hover:text-on-surface">Recurring</button>
+<button class="px-4 py-1.5 rounded-md text-sm font-medium text-on-surface-variant hover:text-on-surface">New</button>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-lowest border-outline-variant/20 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-full md:w-64 border" placeholder="Search customers..." type="text"/>
+</div>
+<button class="p-2 bg-surface-container-lowest border border-outline-variant/20 rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/10">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant text-[11px] uppercase tracking-widest font-bold">
+<th class="px-6 py-4">Customer Name</th>
+<th class="px-6 py-4">Pedidos</th>
+<th class="px-6 py-4">Total Spent</th>
+<th class="px-6 py-4">Last Order</th>
+<th class="px-6 py-4">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low">
+<tr class="hover:bg-surface-container-low/50 transition-colors cursor-pointer">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-lg bg-secondary-container flex items-center justify-center text-secondary font-bold">JD</div>
+<div>
+<p class="font-bold text-on-surface">Jane Doe</p>
+<p class="text-xs text-on-surface-variant">+1 (555) 012-3456</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-semibold text-on-surface">42</td>
+<td class="px-6 py-5 font-bold text-on-surface">$1,240.50</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">2 days ago</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-primary-container text-on-primary-container text-[10px] font-black uppercase rounded-full">Recurring</span>
+</td>
+</tr>
+<tr class="bg-surface-container-low/20 hover:bg-surface-container-low/50 transition-colors cursor-pointer">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-lg bg-tertiary-container flex items-center justify-center text-tertiary font-bold">MS</div>
+<div>
+<p class="font-bold text-on-surface">Marcus Sterling</p>
+<p class="text-xs text-on-surface-variant">+1 (555) 987-6543</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-semibold text-on-surface">1</td>
+<td class="px-6 py-5 font-bold text-on-surface">$45.00</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">5 hours ago</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant text-[10px] font-black uppercase rounded-full">New</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors cursor-pointer">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-lg bg-secondary-container flex items-center justify-center text-secondary font-bold">AL</div>
+<div>
+<p class="font-bold text-on-surface">Anita Lopez</p>
+<p class="text-xs text-on-surface-variant">+1 (555) 234-5678</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-semibold text-on-surface">86</td>
+<td class="px-6 py-5 font-bold text-on-surface">$3,105.20</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Yesterday</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-primary-container text-on-primary-container text-[10px] font-black uppercase rounded-full">Recurring</span>
+</td>
+</tr>
+<tr class="bg-surface-container-low/20 hover:bg-surface-container-low/50 transition-colors cursor-pointer">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-lg bg-error-container/20 flex items-center justify-center text-error font-bold">RH</div>
+<div>
+<p class="font-bold text-on-surface">Robert Hill</p>
+<p class="text-xs text-on-surface-variant">+1 (555) 111-2222</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-semibold text-on-surface">12</td>
+<td class="px-6 py-5 font-bold text-on-surface">$412.00</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">3 months ago</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-error-container text-on-error-container text-[10px] font-black uppercase rounded-full">Inactive</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Profile Sidebar / Campaign Quick View (Right Col) -->
+<div class="xl:col-span-4 space-y-8">
+<!-- Customer Profile Card -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10 shadow-sm">
+<div class="flex items-start justify-between mb-6">
+<h3 class="text-lg font-bold">Customer Profile</h3>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">open_in_new</span></button>
+</div>
+<div class="text-center mb-6">
+<div class="h-20 w-20 rounded-full bg-white border-4 border-white shadow-sm mx-auto overflow-hidden">
+<img alt="Customer Profile" data-alt="close up profile of a middle aged woman smiling, warm cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH2uAaj0veDsJOpvD_ry5E0XFJWGa2-cvK_OSIMCw6fq8fndsCI3-lE_b4vuqEaPnhSDwAuNKQ6C3aRFmMSX1d22LHYIPdLygzc2A9nIrMrHvqgiw4MBrLlKmn71N9umZiqS-xpgRgflUHd9-ZDbaySGfjHV0lC9dNYaLaJQC2uTQDy50I_d0SiZEtgvh2Y-oG4c7YFHyHq3hEDQ_yVtem86pUzSW-MS-Fh5piKA52SxdHHsFJwdJNhF9_qbz22ETXqS86Y-RuVw"/>
+</div>
+<h4 class="text-xl font-extrabold mt-3">Jane Doe</h4>
+<span class="inline-block px-3 py-1 mt-1 bg-tertiary text-on-tertiary text-[10px] font-bold rounded uppercase">VIP Member</span>
+</div>
+<div class="space-y-4 text-sm">
+<div class="flex justify-between p-3 bg-white/50 rounded-lg">
+<span class="text-on-surface-variant font-medium">Default Address</span>
+<span class="text-on-surface font-bold text-right">742 Evergreen Terr, <br/>Springfield</span>
+</div>
+<div class="flex justify-between p-3 bg-white/50 rounded-lg">
+<span class="text-on-surface-variant font-medium">Loyalty Segment</span>
+<span class="text-on-surface font-bold">High Tier</span>
+</div>
+<div class="pt-4">
+<p class="text-xs font-bold uppercase text-on-surface-variant mb-3">Order History</p>
+<div class="space-y-2">
+<div class="flex items-center gap-3 text-xs p-2 hover:bg-white rounded transition-colors">
+<span class="material-symbols-outlined text-primary">package_2</span>
+<div class="flex-1">
+<p class="font-bold">Order #8821</p>
+<p class="text-on-surface-variant">Delivered • May 14</p>
+</div>
+<span class="font-bold">$42.50</span>
+</div>
+<div class="flex items-center gap-3 text-xs p-2 hover:bg-white rounded transition-colors">
+<span class="material-symbols-outlined text-primary">package_2</span>
+<div class="flex-1">
+<p class="font-bold">Order #8710</p>
+<p class="text-on-surface-variant">Delivered • Apr 28</p>
+</div>
+<span class="font-bold">$120.00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Campaigns -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/10">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-bold text-on-surface">Campaigns</h3>
+<button class="text-xs font-bold text-primary flex items-center gap-1">Nova Campanha <span class="material-symbols-outlined text-sm">add</span></button>
+</div>
+<div class="space-y-4">
+<div class="border-l-4 border-primary pl-4 py-1">
+<p class="text-xs font-bold text-on-surface-variant">Last Week</p>
+<p class="font-bold text-sm">Spring Delivery Promo</p>
+<div class="flex gap-4 mt-2">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Open Rate</p>
+<p class="text-sm font-black text-primary">42.8%</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Clicks</p>
+<p class="text-sm font-black text-secondary">1.2k</p>
+</div>
+</div>
+</div>
+<div class="border-l-4 border-surface-container-highest pl-4 py-1">
+<p class="text-xs font-bold text-on-surface-variant">2 weeks ago</p>
+<p class="font-bold text-sm">Customer Retention V2</p>
+<div class="flex gap-4 mt-2">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Open Rate</p>
+<p class="text-sm font-black text-primary">31.2%</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Clicks</p>
+<p class="text-sm font-black text-secondary">842</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Campaign Editor (Floating/Modal style but inline for layout) -->
+<section class="bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/20 overflow-hidden max-w-4xl mx-auto">
+<div class="bg-surface-container-low px-8 py-4 border-b border-outline-variant/10 flex items-center justify-between">
+<h2 class="text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">edit_square</span>
+                        Campaign Editor
+                    </h2>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 text-xs font-bold text-on-surface-variant hover:text-on-surface uppercase tracking-wider">Preview</button>
+<button class="px-4 py-1.5 bg-primary text-on-primary rounded text-xs font-bold uppercase tracking-wider shadow-sm">Send Now</button>
+</div>
+</div>
+<div class="p-8 space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-1.5">
+<label class="text-[11px] font-black uppercase text-on-surface-variant tracking-widest">Campaign Name</label>
+<input class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20 outline-none text-sm font-medium" type="text" value="New Season Special Offer"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[11px] font-black uppercase text-on-surface-variant tracking-widest">Segmentation</label>
+<select class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20 outline-none text-sm font-medium appearance-none">
+<option>Only recurring customers</option>
+<option>All customers</option>
+<option>Inactive customers</option>
+<option>High-spenders only</option>
+</select>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="text-[11px] font-black uppercase text-on-surface-variant tracking-widest">Email Content</label>
+<div class="border border-outline-variant/30 rounded-xl overflow-hidden">
+<div class="bg-surface-container-low p-2 border-b border-outline-variant/10 flex gap-2">
+<button class="p-1.5 hover:bg-white rounded transition-colors material-symbols-outlined text-sm">format_bold</button>
+<button class="p-1.5 hover:bg-white rounded transition-colors material-symbols-outlined text-sm">format_italic</button>
+<button class="p-1.5 hover:bg-white rounded transition-colors material-symbols-outlined text-sm">format_underlined</button>
+<div class="w-px bg-outline-variant/20 mx-1"></div>
+<button class="p-1.5 hover:bg-white rounded transition-colors material-symbols-outlined text-sm">link</button>
+<button class="p-1.5 hover:bg-white rounded transition-colors material-symbols-outlined text-sm">image</button>
+</div>
+<textarea class="w-full bg-white border-none p-6 text-sm focus:ring-0 resize-none" placeholder="Write your campaign message here..." rows="6">Hi {customer_name},
+
+We noticed you haven't ordered with us in a while! As a valued Recurring member, we'd love to offer you 20% OFF your next delivery.
+
+Use code: BACK20 at checkout.
+
+Best,
+The Delivery Team</textarea>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Mobile BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 pb-safe bg-[#f7f9fb]/80 dark:bg-slate-900/80 backdrop-blur-md z-50 border-t border-[#a9b4b9]/20 shadow-[0_-4px_12px_rgba(42,52,57,0.05)]">
+<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#565e74] scale-110" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">CRM</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="#">
+<span class="material-symbols-outlined">campaign</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Ads</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Account</span>
+</a>
+</nav>
+</body></html>
