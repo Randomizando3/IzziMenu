@@ -1863,6 +1863,7 @@
     var selectedCategory = "Hambúrgueres";
     var selectedProductId = null;
     var draftProduct = null;
+    var editorFocusTimeoutId = null;
 
     if (!categoryCard || !productPanel || !editorSection) {
       return;
@@ -1992,6 +1993,34 @@
       }
     }
 
+    function bringEditorIntoView() {
+      if (!editorSection) {
+        return;
+      }
+
+      var bannerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--izzimenu-demo-banner-height")) || 0;
+      var editorTop = editorSection.getBoundingClientRect().top + window.scrollY;
+      var targetTop = Math.max(editorTop - bannerHeight - 24, 0);
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: "smooth"
+      });
+
+      editorSection.classList.remove("izzimenu-demo-editor-focus");
+      window.requestAnimationFrame(function () {
+        editorSection.classList.add("izzimenu-demo-editor-focus");
+      });
+
+      if (editorFocusTimeoutId) {
+        window.clearTimeout(editorFocusTimeoutId);
+      }
+
+      editorFocusTimeoutId = window.setTimeout(function () {
+        editorSection.classList.remove("izzimenu-demo-editor-focus");
+      }, 1800);
+    }
+
     function persistDraft(message) {
       if (!draftProduct) {
         return;
@@ -2031,6 +2060,7 @@
       renderCategories();
       renderProducts();
       syncEditorFields();
+      bringEditorIntoView();
       showDemoToast("Produto criado", "O novo item foi adicionado apenas nesta demo para navegação comercial.", "success");
     }
 
@@ -2062,6 +2092,7 @@
           selectedProductId = productId;
           syncEditorFields();
           renderProducts();
+          bringEditorIntoView();
           return;
         }
 
@@ -2075,6 +2106,7 @@
           renderCategories();
           renderProducts();
           syncEditorFields();
+          bringEditorIntoView();
           showDemoToast("Produto duplicado", "Você acabou de duplicar " + product.name + " na demo.", "success");
           return;
         }
@@ -2098,6 +2130,7 @@
         selectedProductId = row.getAttribute("data-catalog-product");
         syncEditorFields();
         renderProducts();
+        bringEditorIntoView();
       }
 
       var emptyButton = event.target.closest("[data-catalog-action='new-product-empty']");
@@ -2216,6 +2249,7 @@
         renderCategories();
         renderProducts();
         syncEditorFields();
+        bringEditorIntoView();
       });
     }
 
