@@ -134,6 +134,19 @@
       .trim();
   }
 
+  function isPrimaryActionLabel(label) {
+    return [
+      /\bnovo\s+\w+/,
+      /\bnova\s+\w+/,
+      /salvar alteracoes/,
+      /ver pedidos/,
+      /finalizar pedido/,
+      /confirmar pedido/
+    ].some(function (pattern) {
+      return pattern.test(label);
+    });
+  }
+
   function makeBanner() {
     var banner = document.createElement("div");
     banner.className = "izzimenu-demo-banner";
@@ -213,6 +226,13 @@
   }
 
   function patchButtons() {
+    document.querySelectorAll("button, a").forEach(function (element) {
+      var label = normalize(element.textContent || element.getAttribute("aria-label") || "");
+      if (isPrimaryActionLabel(label)) {
+        element.classList.add("izzimenu-demo-cta");
+      }
+    });
+
     document.querySelectorAll("button").forEach(function (button) {
       var label = normalize(button.textContent);
       if (label.indexOf("finalizar pedido") !== -1) {
