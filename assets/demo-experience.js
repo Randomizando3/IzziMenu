@@ -130,8 +130,10 @@
     });
   }
 
-  document.body.prepend(makeNav());
   document.body.prepend(makeBanner());
+  if (!isAdmin) {
+    document.body.prepend(makeNav());
+  }
   document.body.appendChild(makeBackButton());
 
   patchAnchorByText(document.querySelector("aside"));
