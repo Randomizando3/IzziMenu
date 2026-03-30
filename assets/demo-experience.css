@@ -65,6 +65,32 @@ body.izzimenu-demo-admin .izzimenu-admin-main > * {
   max-width: 100%;
 }
 
+body.izzimenu-demo-admin .izzimenu-admin-content {
+  width: 100%;
+  min-width: 0;
+}
+
+body.izzimenu-demo-admin .izzimenu-admin-content--default {
+  padding: 2rem;
+}
+
+body.izzimenu-demo-admin .izzimenu-admin-content--roomy {
+  padding: 1.5rem;
+}
+
+body.izzimenu-demo-admin .izzimenu-admin-content--wide {
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+body.izzimenu-demo-admin .izzimenu-admin-content--stacked > * + * {
+  margin-top: 2rem;
+}
+
+body.izzimenu-demo-admin .izzimenu-admin-content--bottom-space {
+  padding-bottom: 6rem;
+}
+
 body.izzimenu-demo-admin .izzimenu-admin-main .grid,
 body.izzimenu-demo-admin .izzimenu-admin-main .flex,
 body.izzimenu-demo-admin .izzimenu-admin-main table,
@@ -699,5 +725,16 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
 
   .izzimenu-admin-search input {
     width: 13rem;
+  }
+
+  body.izzimenu-demo-admin .izzimenu-admin-content--default,
+  body.izzimenu-demo-admin .izzimenu-admin-content--roomy {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  body.izzimenu-demo-admin .izzimenu-admin-content--roomy {
+    padding: 3rem;
   }
 }
