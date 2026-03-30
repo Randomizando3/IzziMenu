@@ -397,7 +397,7 @@
       return;
     }
 
-    topBar.className = "izzimenu-admin-topbar sticky top-0 z-30 flex justify-between items-center w-full px-8 h-12";
+    topBar.className = "izzimenu-admin-topbar sticky top-0 z-30 flex justify-between items-center w-full px-8 h-10";
 
     if (topBar.parentElement === document.body) {
       topBar.classList.add("izzimenu-admin-topbar--offset");
