@@ -3,8 +3,12 @@
   --izzimenu-demo-nav-height: 68px;
 }
 
-body.izzimenu-demo-page {
+body.izzimenu-demo-public {
   padding-top: calc(var(--izzimenu-demo-banner-height) + var(--izzimenu-demo-nav-height));
+}
+
+body.izzimenu-demo-admin {
+  padding-top: var(--izzimenu-demo-banner-height);
 }
 
 .izzimenu-demo-banner {
@@ -189,26 +193,30 @@ body.izzimenu-demo-page {
   line-height: 1;
 }
 
-body.izzimenu-demo-page .sticky.top-0 {
+body.izzimenu-demo-public .sticky.top-0 {
   top: calc(var(--izzimenu-demo-banner-height) + var(--izzimenu-demo-nav-height)) !important;
 }
 
 body.izzimenu-demo-admin aside.fixed {
-  top: calc(var(--izzimenu-demo-banner-height) + var(--izzimenu-demo-nav-height)) !important;
-  height: calc(100vh - var(--izzimenu-demo-banner-height) - var(--izzimenu-demo-nav-height)) !important;
+  top: var(--izzimenu-demo-banner-height) !important;
+  height: calc(100vh - var(--izzimenu-demo-banner-height)) !important;
 }
 
 body.izzimenu-demo-admin .top-16 {
-  top: calc(var(--izzimenu-demo-banner-height) + var(--izzimenu-demo-nav-height)) !important;
+  top: var(--izzimenu-demo-banner-height) !important;
 }
 
 body.izzimenu-demo-admin .pt-20 {
   padding-top: 1.25rem !important;
 }
 
+body.izzimenu-demo-admin .sticky.top-0 {
+  top: var(--izzimenu-demo-banner-height) !important;
+}
+
 body.izzimenu-demo-admin .md\:ml-64,
 body.izzimenu-demo-admin .lg\:ml-64 {
-  min-height: calc(100vh - var(--izzimenu-demo-banner-height) - var(--izzimenu-demo-nav-height));
+  min-height: calc(100vh - var(--izzimenu-demo-banner-height));
 }
 
 body.izzimenu-demo-admin .md\:hidden.fixed.bottom-0,
