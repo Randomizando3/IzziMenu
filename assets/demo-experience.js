@@ -196,6 +196,10 @@
 
     topBar.className = "izzimenu-admin-topbar sticky top-0 z-30 flex justify-between items-center w-full px-8 h-16";
 
+    if (topBar.parentElement === document.body) {
+      topBar.classList.add("izzimenu-admin-topbar--offset");
+    }
+
     var childElements = Array.from(topBar.children).filter(function (child) {
       return child.nodeType === 1;
     });
