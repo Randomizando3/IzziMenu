@@ -881,8 +881,25 @@
       "<span class=\"material-symbols-outlined\">notifications</span>" +
       "<span class=\"izzimenu-admin-icon-dot\"></span>";
 
+    var storeButton = Array.from(rightGroup.children).find(function (child) {
+      return child.dataset && child.dataset.demoRole === "view-store";
+    });
+
+    if (!storeButton) {
+      storeButton = document.createElement("a");
+    }
+
+    storeButton.className = "izzimenu-admin-store-btn hidden sm:inline-flex";
+    storeButton.dataset.demoRole = "view-store";
+    storeButton.href = "/cardapio.html";
+    storeButton.innerHTML =
+      "<span class=\"material-symbols-outlined\">storefront</span>" +
+      "<span>Ver Loja</span>";
+
+    rightGroup.insertBefore(storeButton, notificationButton);
+
     Array.from(rightGroup.children).forEach(function (child) {
-      if (child === searchWrapper || child === notificationButton) {
+      if (child === searchWrapper || child === storeButton || child === notificationButton) {
         return;
       }
 
