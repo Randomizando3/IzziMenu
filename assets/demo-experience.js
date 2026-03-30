@@ -14,13 +14,13 @@
     { href: "/admin/configuracoes.html", label: "Configurações", icon: "settings" }
   ];
   var pages = [
-    { href: "/cardapio.html", label: "Cardapio" },
-    { href: "/checkout.html", label: "Checkout" },
+    { href: "/cardapio.html", label: "Cardápio" },
+    { href: "/checkout.html", label: "Finalização" },
     { href: "/admin/dashboard.html", label: "Painel" },
     { href: "/admin/pedidos.html", label: "Pedidos" },
-    { href: "/admin/cardapio.html", label: "Cardapio Admin" },
+    { href: "/admin/cardapio.html", label: "Cardápio Admin" },
     { href: "/admin/clientes.html", label: "Clientes" },
-    { href: "/admin/configuracoes.html", label: "Configuracoes" }
+    { href: "/admin/configuracoes.html", label: "Configurações" }
   ];
   var sidebarStateKey = "izzimenu-admin-sidebar-collapsed";
   var avatarStateKey = "izzimenu-admin-avatar-src";
