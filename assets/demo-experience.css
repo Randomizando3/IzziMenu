@@ -1,5 +1,5 @@
 :root {
-  --izzimenu-demo-banner-height: 42px;
+  --izzimenu-demo-banner-height: 34px;
   --izzimenu-demo-nav-height: 68px;
   --izzimenu-admin-sidebar-width: 16rem;
 }
@@ -111,9 +111,9 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
   color: #f7f9fb;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   font-family: "Inter", sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -136,7 +136,7 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
 }
 
 .izzimenu-demo-banner__hint {
-  font-size: 0.7rem;
+  font-size: 0.64rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   opacity: 0.75;
@@ -146,7 +146,7 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
   flex-shrink: 0;
   color: #f7f9fb;
   text-decoration: none;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   opacity: 0.84;
@@ -286,8 +286,8 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
   max-width: 100vw;
   overflow: visible;
   min-height: 3.5rem;
-  padding-top: 0.15rem;
-  padding-bottom: 0.15rem;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .izzimenu-admin-topbar--offset {
@@ -365,6 +365,12 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
   transition: background-color 150ms ease, color 150ms ease;
 }
 
+.izzimenu-admin-icon-btn.is-active,
+.izzimenu-admin-icon-btn:hover {
+  background: #f0f4f7;
+  color: #2a3439;
+}
+
 .izzimenu-admin-icon-btn:hover {
   background: #f0f4f7;
   color: #2a3439;
@@ -392,12 +398,204 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
   overflow: hidden;
   border: 1px solid rgba(86, 94, 116, 0.12);
   background: #e8eff3;
+  cursor: pointer;
 }
 
 .izzimenu-admin-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.izzimenu-admin-popover {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  z-index: 40;
+  width: min(22rem, calc(100vw - 2rem));
+  border: 1px solid rgba(86, 94, 116, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 24px 48px -30px rgba(42, 52, 57, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.izzimenu-admin-popover.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.izzimenu-admin-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.8rem;
+  border-bottom: 1px solid rgba(86, 94, 116, 0.1);
+}
+
+.izzimenu-admin-popover__header strong {
+  color: #2a3439;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.izzimenu-admin-popover__header button {
+  border: 0;
+  background: none;
+  color: #566166;
+  font-family: "Inter", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.izzimenu-admin-notification-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+.izzimenu-admin-notification-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  width: 100%;
+  padding: 0.85rem 0.9rem;
+  border: 0;
+  border-radius: 0.8rem;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.izzimenu-admin-notification-item:hover {
+  background: #f0f4f7;
+}
+
+.izzimenu-admin-notification-item.is-unread {
+  background: rgba(218, 226, 253, 0.45);
+}
+
+.izzimenu-admin-notification-item strong {
+  color: #2a3439;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.izzimenu-admin-notification-item span {
+  color: #566166;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.izzimenu-admin-notification-item em {
+  color: #7c8793;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.izzimenu-admin-avatar-menu {
+  width: min(19rem, calc(100vw - 2rem));
+  padding: 0.75rem;
+}
+
+.izzimenu-admin-avatar-menu__preview {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.25rem 0.25rem 0.85rem;
+}
+
+.izzimenu-admin-avatar-menu__preview img {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 1px solid rgba(86, 94, 116, 0.12);
+}
+
+.izzimenu-admin-avatar-menu__preview strong {
+  display: block;
+  color: #2a3439;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.izzimenu-admin-avatar-menu__preview span {
+  display: block;
+  margin-top: 0.2rem;
+  color: #566166;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.izzimenu-admin-avatar-menu__action {
+  width: 100%;
+  min-height: 2.8rem;
+  margin-top: 0.45rem;
+  border: 0;
+  border-radius: 0.8rem;
+  background: #f0f4f7;
+  color: #2a3439;
+  font-family: "Inter", sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.izzimenu-admin-avatar-menu__action:hover {
+  background: #e8eff3;
+}
+
+.izzimenu-admin-order-row {
+  transition: box-shadow 150ms ease, transform 150ms ease, background-color 150ms ease;
+}
+
+.izzimenu-admin-order-row.is-selected {
+  box-shadow: 0 16px 28px -24px rgba(42, 52, 57, 0.55);
+  transform: translateX(4px);
+}
+
+.izzimenu-admin-orders-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 11rem;
+  margin-top: 1rem;
+  border: 1px dashed rgba(86, 94, 116, 0.16);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+  text-align: center;
+}
+
+.izzimenu-admin-orders-empty strong {
+  color: #2a3439;
+  font-family: "Manrope", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.izzimenu-admin-orders-empty span {
+  max-width: 20rem;
+  color: #566166;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.izzimenu-admin-order-detail {
+  top: calc(var(--izzimenu-demo-banner-height) + 4.5rem) !important;
 }
 
 .izzimenu-admin-side-brand {
@@ -669,7 +867,7 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
 
 @media (max-width: 768px) {
   :root {
-    --izzimenu-demo-banner-height: 38px;
+    --izzimenu-demo-banner-height: 30px;
     --izzimenu-demo-nav-height: 60px;
   }
 
