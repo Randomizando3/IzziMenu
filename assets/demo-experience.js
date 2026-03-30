@@ -22,6 +22,7 @@
     { href: "/admin/clientes.html", label: "Clientes" },
     { href: "/admin/configuracoes.html", label: "Configuracoes" }
   ];
+  var sidebarStateKey = "izzimenu-admin-sidebar-collapsed";
 
   function normalize(text) {
     return (text || "")
@@ -140,6 +141,22 @@
     return match ? match.href : "/admin/dashboard.html";
   }
 
+  function readSidebarCollapsedState() {
+    try {
+      return window.localStorage.getItem(sidebarStateKey) === "1";
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function writeSidebarCollapsedState(collapsed) {
+    try {
+      window.localStorage.setItem(sidebarStateKey, collapsed ? "1" : "0");
+    } catch (error) {
+      return;
+    }
+  }
+
   function getAdminTopBar() {
     return Array.from(document.querySelectorAll("header, nav")).find(function (element) {
       return (
@@ -148,6 +165,19 @@
         /sticky|top-0|h-16/.test(element.className)
       );
     });
+  }
+
+  function placeAdminTopBar(topBar) {
+    var main = document.querySelector("main");
+    if (!topBar || !main) {
+      return topBar;
+    }
+
+    if (topBar.parentElement === document.body) {
+      main.prepend(topBar);
+    }
+
+    return topBar;
   }
 
   function standardizeAdminBrand(topBar) {
@@ -300,6 +330,24 @@
     avatar.innerHTML = "<img alt=\"Admin Profile\" src=\"" + adminAvatarSrc + "\" />";
   }
 
+  function standardizeAdminShell() {
+    var aside = document.querySelector("aside");
+    var main = document.querySelector("main");
+    var shell = aside && aside.parentElement && aside.parentElement.contains(main) ? aside.parentElement : null;
+
+    if (shell) {
+      shell.classList.add("izzimenu-admin-layout");
+    }
+
+    if (aside) {
+      aside.classList.add("izzimenu-admin-sidebar");
+    }
+
+    if (main) {
+      main.classList.add("izzimenu-admin-main");
+    }
+  }
+
   function standardizeAdminSidebar() {
     var aside = document.querySelector("aside");
     if (!aside) {
@@ -378,17 +426,86 @@
     }).join("");
   }
 
+  function setSidebarCollapsed(collapsed) {
+    document.body.classList.toggle("izzimenu-admin-sidebar-collapsed", collapsed);
+
+    var toggle = document.querySelector(".izzimenu-admin-sidebar-toggle");
+    if (!toggle) {
+      return;
+    }
+
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+    toggle.setAttribute("aria-label", collapsed ? "Expandir sidebar" : "Recolher sidebar");
+    toggle.setAttribute("title", collapsed ? "Expandir sidebar" : "Recolher sidebar");
+
+    var icon = toggle.querySelector(".material-symbols-outlined");
+    if (icon) {
+      icon.textContent = collapsed ? "chevron_right" : "chevron_left";
+    }
+  }
+
+  function ensureSidebarToggle() {
+    var aside = document.querySelector("aside");
+    var main = document.querySelector("main");
+    if (!aside || !main) {
+      return;
+    }
+
+    var toggle = document.querySelector(".izzimenu-admin-sidebar-toggle");
+    if (!toggle) {
+      toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "izzimenu-admin-sidebar-toggle";
+      toggle.innerHTML = "<span class=\"material-symbols-outlined\">chevron_left</span>";
+      document.body.appendChild(toggle);
+    }
+
+    var desktopMedia = window.matchMedia("(min-width: 1025px)");
+    var syncSidebarState = function () {
+      if (!desktopMedia.matches) {
+        setSidebarCollapsed(false);
+        return;
+      }
+
+      setSidebarCollapsed(readSidebarCollapsedState());
+    };
+
+    if (!toggle.dataset.bound) {
+      toggle.addEventListener("click", function () {
+        if (!desktopMedia.matches) {
+          return;
+        }
+
+        var collapsed = !document.body.classList.contains("izzimenu-admin-sidebar-collapsed");
+        setSidebarCollapsed(collapsed);
+        writeSidebarCollapsedState(collapsed);
+      });
+
+      if (desktopMedia.addEventListener) {
+        desktopMedia.addEventListener("change", syncSidebarState);
+      } else if (desktopMedia.addListener) {
+        desktopMedia.addListener(syncSidebarState);
+      }
+
+      toggle.dataset.bound = "true";
+    }
+
+    syncSidebarState();
+  }
+
   document.body.prepend(makeBanner());
   if (!isAdmin) {
     document.body.prepend(makeNav());
   }
 
   if (isAdmin) {
-    var adminTopBar = getAdminTopBar();
+    var adminTopBar = placeAdminTopBar(getAdminTopBar());
+    standardizeAdminShell();
     standardizeAdminBrand(adminTopBar);
     standardizeAdminTopMenu(adminTopBar);
     standardizeAdminSidebar();
     standardizeAdminBottomNav();
+    ensureSidebarToggle();
   }
 
   patchAnchorByText(document.querySelector("aside"));
