@@ -1,5 +1,5 @@
 :root {
-  --izzimenu-demo-banner-height: 34px;
+  --izzimenu-demo-banner-height: 30px;
   --izzimenu-demo-nav-height: 68px;
   --izzimenu-admin-sidebar-width: 16rem;
 }
@@ -285,7 +285,7 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
   box-sizing: border-box;
   max-width: 100vw;
   overflow: visible;
-  min-height: 3.5rem;
+  min-height: 3rem;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -867,7 +867,7 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
 
 @media (max-width: 768px) {
   :root {
-    --izzimenu-demo-banner-height: 30px;
+    --izzimenu-demo-banner-height: 28px;
     --izzimenu-demo-nav-height: 60px;
   }
 
