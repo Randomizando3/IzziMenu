@@ -219,6 +219,44 @@ body.izzimenu-demo-admin {
   border-bottom-color: #565e74;
 }
 
+.izzimenu-admin-header-brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  text-decoration: none;
+}
+
+.izzimenu-admin-header-brand img {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+.izzimenu-admin-side-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.35rem 0.2rem 0.95rem;
+  margin-bottom: 0.35rem;
+  text-decoration: none;
+}
+
+.izzimenu-admin-side-brand img {
+  height: 38px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+}
+
+.izzimenu-admin-side-brand span {
+  color: #566166;
+  font-family: "Inter", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .izzimenu-admin-side-nav {
   display: flex;
   flex: 1;
@@ -422,5 +460,9 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
 
   .izzimenu-admin-top-menu a {
     font-size: 0.84rem;
+  }
+
+  .izzimenu-admin-header-brand img {
+    height: 26px;
   }
 }
