@@ -331,6 +331,10 @@
     }) || null;
   }
 
+  function hasImage(element) {
+    return !!(element && (element.tagName === "IMG" || (element.querySelector && element.querySelector("img"))));
+  }
+
   function getAdminTopBar() {
     return Array.from(document.querySelectorAll("header, nav")).find(function (element) {
       return (
@@ -393,7 +397,7 @@
       return;
     }
 
-    topBar.className = "izzimenu-admin-topbar sticky top-0 z-30 flex justify-between items-center w-full px-8 h-14";
+    topBar.className = "izzimenu-admin-topbar sticky top-0 z-30 flex justify-between items-center w-full px-8 h-12";
 
     if (topBar.parentElement === document.body) {
       topBar.classList.add("izzimenu-admin-topbar--offset");
@@ -456,16 +460,21 @@
       return child.querySelector && child.querySelector("input");
     });
 
-    if (!searchWrapper) {
-      searchWrapper = document.createElement("div");
-      rightGroup.prepend(searchWrapper);
-    }
+    if (currentPath === "/admin/pedidos.html") {
+      if (!searchWrapper) {
+        searchWrapper = document.createElement("div");
+        rightGroup.prepend(searchWrapper);
+      }
 
-    searchWrapper.className = "izzimenu-admin-search hidden sm:block";
-    searchWrapper.dataset.demoRole = "admin-search";
-    searchWrapper.innerHTML =
-      "<span class=\"material-symbols-outlined\">search</span>" +
-      "<input aria-label=\"Buscar pedidos\" placeholder=\"Buscar pedidos...\" type=\"text\" />";
+      searchWrapper.className = "izzimenu-admin-search hidden sm:block";
+      searchWrapper.dataset.demoRole = "admin-search";
+      searchWrapper.innerHTML =
+        "<span class=\"material-symbols-outlined\">search</span>" +
+        "<input aria-label=\"Buscar pedidos\" placeholder=\"Buscar pedidos...\" type=\"text\" />";
+    } else if (searchWrapper) {
+      searchWrapper.remove();
+      searchWrapper = null;
+    }
 
     Array.from(rightGroup.children).forEach(function (child) {
       if (child === searchWrapper) {
@@ -493,14 +502,18 @@
       "<span class=\"material-symbols-outlined\">notifications</span>" +
       "<span class=\"izzimenu-admin-icon-dot\"></span>";
 
-    var avatar = Array.from(rightGroup.children).find(function (child) {
-      return child !== notificationButton && child.querySelector && child.querySelector("img");
+    Array.from(rightGroup.children).forEach(function (child) {
+      if (child === searchWrapper || child === notificationButton) {
+        return;
+      }
+
+      if (hasImage(child)) {
+        child.remove();
+      }
     });
 
-    if (!avatar) {
-      avatar = document.createElement("div");
-      rightGroup.appendChild(avatar);
-    }
+    var avatar = document.createElement("div");
+    rightGroup.appendChild(avatar);
 
     avatar.className = "izzimenu-admin-avatar";
     avatar.dataset.demoRole = "avatar-toggle";
