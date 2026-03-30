@@ -1,5 +1,5 @@
 :root {
-  --izzimenu-demo-banner-height: 26px;
+  --izzimenu-demo-banner-height: 22px;
   --izzimenu-demo-nav-height: 68px;
   --izzimenu-admin-sidebar-width: 16rem;
   --izzimenu-brand-orange: #f97316;
@@ -294,7 +294,7 @@ body.izzimenu-demo-admin .izzimenu-admin-main .overflow-x-auto {
 }
 
 body.izzimenu-demo-admin .izzimenu-admin-topbar + * {
-  margin-top: 0.9rem;
+  margin-top: 0.55rem;
 }
 
 .izzimenu-admin-topbar--offset {
@@ -462,6 +462,59 @@ body.izzimenu-demo-admin .izzimenu-admin-topbar + * {
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.izzimenu-demo-toast-stack {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1400;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.izzimenu-demo-toast {
+  width: min(24rem, calc(100vw - 2rem));
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  background: rgba(42, 52, 57, 0.96);
+  color: #f7f9fb;
+  box-shadow: 0 22px 36px -28px rgba(42, 52, 57, 0.72);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.izzimenu-demo-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.izzimenu-demo-toast--warning {
+  background: rgba(249, 115, 22, 0.97);
+}
+
+.izzimenu-demo-toast--success {
+  background: rgba(17, 94, 89, 0.96);
+}
+
+.izzimenu-demo-toast strong {
+  display: block;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.izzimenu-demo-toast span {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  opacity: 0.92;
 }
 
 .izzimenu-admin-notification-list {
@@ -893,7 +946,7 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
 
 @media (max-width: 768px) {
   :root {
-    --izzimenu-demo-banner-height: 24px;
+    --izzimenu-demo-banner-height: 20px;
     --izzimenu-demo-nav-height: 60px;
   }
 
