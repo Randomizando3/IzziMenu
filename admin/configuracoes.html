@@ -92,11 +92,11 @@
 <div class="flex items-center gap-8">
 <span class="text-xl font-bold text-[#2a3439] dark:text-white tracking-tighter">IzziMenu</span>
 <div class="hidden md:flex gap-6">
-<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="#">Visão Geral</a>
-<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="#">Pedidos</a>
-<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="#">Cardápio</a>
-<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="#">Fleet</a>
-<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="#">Reports</a>
+<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="/admin/dashboard.html">Visão Geral</a>
+<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="/admin/pedidos.html">Pedidos</a>
+<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="/admin/cardapio.html">Cardápio</a>
+<a class="font-manrope text-sm font-semibold tracking-tight text-[#566166] dark:text-slate-400 hover:bg-[#f0f4f7] dark:hover:bg-slate-800 transition-colors" href="/admin/clientes.html">Clientes</a>
+<a class="font-manrope text-sm font-semibold tracking-tight text-[#565e74] dark:text-white border-b-2 border-[#565e74] pb-1" href="/admin/configuracoes.html">Configurações</a>
 </div>
 </div>
 <div class="flex items-center gap-4">
@@ -126,27 +126,24 @@
 </div>
 </div>
 <nav class="space-y-1">
-<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="#">
+<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="/admin/dashboard.html">
 <span class="material-symbols-outlined">dashboard</span> Resumo
                 </a>
-<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="#">
-<span class="material-symbols-outlined">explore</span> Mapa ao Vivo
+<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="/admin/pedidos.html">
+<span class="material-symbols-outlined">package_2</span> Pedidos
                 </a>
-<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="#">
-<span class="material-symbols-outlined">local_shipping</span> Expedição
+<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="/admin/cardapio.html">
+<span class="material-symbols-outlined">restaurant_menu</span> Cardápio
                 </a>
-<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="#">
-<span class="material-symbols-outlined">group</span> Entregadores
+<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="/admin/clientes.html">
+<span class="material-symbols-outlined">group</span> Clientes
                 </a>
-<a class="flex items-center gap-3 px-3 py-2 text-[#566166] dark:text-slate-400 hover:text-[#2a3439] hover:bg-[#d9e4ea] dark:hover:bg-slate-700 transition-colors" href="#">
-<span class="material-symbols-outlined">analytics</span> Relatórios
-                </a>
-<a class="flex items-center gap-3 px-3 py-2 bg-[#ffffff] dark:bg-slate-700 text-[#2a3439] dark:text-white rounded-lg shadow-sm translate-x-1 transition-transform" href="#">
+<a class="flex items-center gap-3 px-3 py-2 bg-[#ffffff] dark:bg-slate-700 text-[#2a3439] dark:text-white rounded-lg shadow-sm translate-x-1 transition-transform" href="/admin/configuracoes.html">
 <span class="material-symbols-outlined">settings</span> Configurações
                 </a>
 </nav>
 <div class="mt-auto pt-4 border-t border-outline-variant/10">
-<a class="flex items-center gap-3 px-3 py-2 text-[#566166] hover:text-[#2a3439] transition-colors" href="#">
+<a class="flex items-center gap-3 px-3 py-2 text-[#566166] hover:text-[#2a3439] transition-colors" href="/index.html#faq">
 <span class="material-symbols-outlined">help</span> Ajuda
                 </a>
 <button class="mt-4 w-full bg-primary text-on-primary py-2.5 rounded-sm font-bold tracking-tight shadow-md hover:opacity-90 transition-opacity">
@@ -400,21 +397,21 @@
 </div>
 <!-- BottomNavBar (Mobile only) -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 pb-safe bg-[#f7f9fb]/80 dark:bg-slate-900/80 backdrop-blur-md z-50 border-t border-[#a9b4b9]/20 shadow-[0_-4px_12px_rgba(42,52,57,0.05)]">
-<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="#">
+<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="/admin/dashboard.html">
 <span class="material-symbols-outlined">home</span>
 <span class="font-inter text-[10px] font-bold uppercase tracking-wider">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="#">
+<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="/admin/pedidos.html">
 <span class="material-symbols-outlined">package_2</span>
 <span class="font-inter text-[10px] font-bold uppercase tracking-wider">Pedidos</span>
 </a>
-<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="#">
-<span class="material-symbols-outlined">distance</span>
-<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Track</span>
+<a class="flex flex-col items-center justify-center text-[#566166] dark:text-slate-500 hover:opacity-80" href="/admin/cardapio.html">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Cardápio</span>
 </a>
-<a class="flex flex-col items-center justify-center text-[#565e74] dark:text-white scale-110" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
-<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Account</span>
+<a class="flex flex-col items-center justify-center text-[#565e74] dark:text-white scale-110" href="/admin/configuracoes.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Config</span>
 </a>
 </nav>
 <script defer src="/assets/demo-experience.js"></script>
