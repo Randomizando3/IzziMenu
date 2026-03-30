@@ -1,0 +1,443 @@
+﻿<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IzziMenu | Sistema de pedidos online para delivery, retirada e WhatsApp</title>
+<meta content="IzziMenu e o sistema de pedidos online da IzziHub para hamburguerias e lanchonetes venderem mais com cardapio digital, checkout rapido, painel da loja e suporte humano." name="description"/>
+<meta content="index,follow" name="robots"/>
+<meta content="website" property="og:type"/>
+<meta content="IzziMenu | Sistema de pedidos online para hamburguerias e lanchonetes" property="og:title"/>
+<meta content="Cardapio digital, checkout, painel administrativo e pedidos por WhatsApp em uma operacao simples e profissional." property="og:description"/>
+<meta content="https://delivery.izzihub.com.br/" property="og:url"/>
+<meta content="https://delivery.izzihub.com.br/assets/cardapio-preview.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<link href="assets/izzimenu-mark.svg" rel="icon" type="image/svg+xml"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed-dim": "#ccd4ee",
+              "outline-variant": "#a9b4b9",
+              "error": "#9f403d",
+              "on-error-container": "#752121",
+              "on-primary-fixed": "#373f54",
+              "on-secondary-container": "#455367",
+              "on-secondary-fixed": "#324053",
+              "on-tertiary-fixed-variant": "#55536f",
+              "on-primary": "#f7f7ff",
+              "primary": "#565e74",
+              "secondary-dim": "#465468",
+              "on-tertiary": "#fcf7ff",
+              "on-tertiary-container": "#4b4a65",
+              "error-dim": "#4e0309",
+              "secondary-container": "#d5e3fc",
+              "surface-container-lowest": "#ffffff",
+              "surface-tint": "#565e74",
+              "error-container": "#fe8983",
+              "on-error": "#fff7f6",
+              "secondary-fixed-dim": "#c7d5ed",
+              "inverse-primary": "#dae2fd",
+              "surface": "#f7f9fb",
+              "surface-bright": "#f7f9fb",
+              "tertiary-dim": "#52506b",
+              "outline": "#717c82",
+              "on-tertiary-fixed": "#393751",
+              "primary-container": "#dae2fd",
+              "primary-fixed": "#dae2fd",
+              "on-primary-fixed-variant": "#535b71",
+              "surface-container-low": "#f0f4f7",
+              "tertiary-fixed": "#dad6f7",
+              "background": "#f7f9fb",
+              "surface-variant": "#d9e4ea",
+              "surface-container": "#e8eff3",
+              "on-surface": "#2a3439",
+              "on-background": "#2a3439",
+              "surface-container-high": "#e1e9ee",
+              "tertiary": "#5e5c78",
+              "inverse-surface": "#0b0f10",
+              "on-secondary": "#f8f8ff",
+              "surface-dim": "#cfdce3",
+              "inverse-on-surface": "#9a9d9f",
+              "tertiary-fixed-dim": "#ccc9e9",
+              "secondary-fixed": "#d5e3fc",
+              "secondary": "#526074",
+              "surface-container-highest": "#d9e4ea",
+              "primary-dim": "#4a5268",
+              "on-surface-variant": "#566166",
+              "on-secondary-fixed-variant": "#4e5c71",
+              "on-primary-container": "#4a5167",
+              "tertiary-container": "#dad6f7"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-nav {
+        background: rgba(247, 249, 251, 0.82);
+        backdrop-filter: blur(12px);
+      }
+      .primary-gradient {
+        background: linear-gradient(145deg, #565e74 0%, #4a5268 100%);
+      }
+      .ambient-shadow {
+        box-shadow: 0 12px 32px -4px rgba(42, 52, 57, 0.08);
+      }
+      .ambient-shadow-strong {
+        box-shadow: 0 28px 80px -24px rgba(42, 52, 57, 0.18);
+      }
+      .soft-grid {
+        background-image:
+          linear-gradient(rgba(113, 124, 130, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(113, 124, 130, 0.08) 1px, transparent 1px);
+        background-size: 28px 28px;
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar (Shared Component Adaptation) -->
+<header class="sticky top-0 z-50 glass-nav">
+<nav class="max-w-7xl mx-auto px-6 md:px-8 py-4 flex items-center justify-between gap-4">
+<a class="flex items-center gap-3" href="/">
+<img alt="IzziMenu" class="h-11 w-auto" src="assets/izzimenu-logo.svg"/>
+</a>
+<div class="hidden md:flex items-center gap-6 text-sm font-semibold text-on-surface-variant">
+<a class="hover:text-on-surface transition-colors" href="#how-it-works">Como funciona</a>
+<a class="hover:text-on-surface transition-colors" href="#benefits">Demonstração</a>
+<a class="hover:text-on-surface transition-colors" href="#pricing">Planos</a>
+<a class="hover:text-on-surface transition-colors" href="#faq">FAQ</a>
+</div>
+<div class="flex items-center gap-3">
+<a class="hidden sm:inline-flex px-4 py-2 rounded-sm font-bold text-primary hover:bg-surface-container-low transition-colors" href="#demo">Ver telas</a>
+<a class="primary-gradient text-on-primary px-5 py-2.5 rounded-sm font-bold shadow-sm hover:opacity-90 transition-opacity" href="https://izzihub.com.br/whatsapp.php?src=izzimenu-navbar&amp;text=Ola%2C%20vim%20da%20landing%20do%20IzziMenu%20e%20quero%20saber%20mais%20sobre%20o%20sistema%20de%20pedidos.">Falar no WhatsApp</a>
+</div>
+</nav>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative px-8 pt-24 pb-32 overflow-hidden">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div class="z-10">
+<span class="inline-block px-3 py-1 bg-primary-container text-on-primary-container text-xs font-bold tracking-widest uppercase rounded-full mb-6">Sistema para delivery e retirada</span>
+<h1 class="font-headline text-5xl md:text-6xl font-extrabold text-on-surface leading-[1.1] tracking-tight mb-8">
+                        Menos conversa perdida. Mais <span class="text-primary">pedidos fechados</span> no seu delivery.
+                    </h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-lg mb-10 leading-relaxed">
+                        O IzziMenu organiza cardápio, checkout, entrega e operação da loja em uma experiência simples para o cliente e profissional para a equipe.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<a class="primary-gradient text-on-primary px-8 py-4 rounded-sm font-bold text-lg shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2" href="https://izzihub.com.br/whatsapp.php?src=izzimenu-hero&amp;text=Ola%2C%20quero%20conhecer%20o%20IzziMenu%20para%20minha%20lanchonete.">
+                            Quero vender com o IzziMenu
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+<a class="bg-surface-container-low text-on-surface font-bold px-8 py-4 rounded-sm hover:bg-surface-container-high transition-colors text-center" href="#benefits">
+                            Ver demonstração
+                        </a>
+</div>
+<div class="mt-8 flex items-center gap-4 text-sm text-on-surface-variant">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-surface" data-alt="close-up portrait of a professional chef smiling with a blurred kitchen background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwNrEpn-uRXFYqQZooFhMUPDDXJ12LvkN6Qk8nE3VJKxdBFvrpMPgrjCyZxHHnPXM76BhL-AQfNIsPVyp5vrchOZCU_egTM1DifRl3Y33w650IrS4AwXzfDvnXPtSD00IrIRqxKv_LZF2RV-8aGDP55r8fGVqxgwxmd_Cr3hzTIQur56LIGkK2GL-E3JBMv3DxTb9eb3DPM7r8g_FlYwgXGu91SaF6cfRX8h1HtdX1srGBxR1BacmY4hPr7Zwg1_nYOcsO-pPZVA"/>
+<img class="w-8 h-8 rounded-full border-2 border-surface" data-alt="close-up portrait of a restaurant owner in a modern cafe setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCadfkZD3RdyAISRmVZvhzZQ5KsrRidueGyL-eV0cfqpC65fPAQ6AC22F2NUX0AjRg4CYZfsso5Kbao5hTIz0tDPnu73uuLLfSG_Sbt4gMMEwjpCZMkIYXRQvejVMwv3FQCcTZOYl9oNU6ZojaO8xXxniYdiOwXui7sn49tvoCVYfTO2yOIePTbp1vh0yTiLFpCFl3d1R80gKthdWQ3I3zoUlGj0eCA0gdOuQ-G_gHMnF69b5PWyanUPeD0d4cnP2S2Ct_kE4BV3g"/>
+<img class="w-8 h-8 rounded-full border-2 border-surface" data-alt="close-up portrait of a happy female pastry chef in a bright bakery" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtpyriV-sPeh16D7_VhRDoDasPo579aS9wm7HImC0pSTp0S8jNm0NLW9pFi13H-XEhUm-GrjeUd-Dft_RnfC0LaoAjBmWnv1xjuODE-9a4oiJRiBsEHh4xeouo5AsEJFGAPdoZpFjZIpkvfcP5k_mLUEwQOFzKURzQTnm8FBnf-kje3aeoFkSp4KqMsAesXz30OIYqdP5pSJBXJUavw-ME65AQlBXmEegKevwjJ-gW9JU1rTqP0r8aM9EzdGbdxYoQp7GZvLwu8w"/>
+</div>
+<p>+500 estabelecimentos organizando melhor o delivery com o IzziMenu</p>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -top-12 -right-12 w-64 h-64 bg-primary-container/30 rounded-full blur-3xl"></div>
+<div class="relative bg-surface-container-lowest ambient-shadow rounded-xl p-4 transform lg:rotate-2">
+<img class="rounded-lg w-full h-[400px] object-cover" data-alt="gourmet artisan pizza with fresh basil and melted mozzarella on a dark slate background with elegant lighting" src="assets/cardapio-preview.png"/>
+<div class="absolute -bottom-6 -left-6 bg-surface-container-lowest p-6 rounded-lg ambient-shadow border border-outline-variant/10 max-w-[240px]">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary" data-weight="fill">check_circle</span>
+<span class="font-bold text-sm">Fluxo pronto para vender</span>
+</div>
+<p class="text-xs text-on-surface-variant">Cardápio, carrinho e pedido em um fluxo claro para o cliente.</p>
+<div class="mt-3 h-1 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="px-6 md:px-8 pb-10 md:pb-16" id="pricing">
+<div class="max-w-7xl mx-auto">
+<div class="primary-gradient rounded-[2rem] p-8 md:p-10 text-on-primary ambient-shadow overflow-hidden relative">
+<div class="absolute right-0 top-0 h-full w-72 bg-white/5 blur-3xl"></div>
+<div class="relative grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
+<div>
+<p class="text-xs uppercase tracking-[0.24em] font-black text-primary-fixed-dim mb-3">Plano de entrada para vender mais</p>
+<h2 class="font-headline text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Comece com um valor leve e escale com operação profissional desde o primeiro pedido.</h2>
+<p class="text-primary-fixed-dim text-base md:text-lg max-w-2xl">Implantação simples, cardápio online, painel em português e atendimento comercial direto no WhatsApp da IzziHub.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="bg-white/10 rounded-2xl p-6">
+<p class="text-xs uppercase tracking-[0.22em] font-black text-primary-fixed-dim mb-2">Fidelidade 12 meses</p>
+<p class="font-headline text-4xl font-extrabold mb-2">R$ 49<span class="text-lg font-bold">/mês</span></p>
+<p class="text-sm text-primary-fixed-dim">Pagamento no cartão, com entrada leve para colocar o delivery no ar mais rápido.</p>
+</div>
+<div class="bg-surface-container-lowest text-on-surface rounded-2xl p-6">
+<p class="text-xs uppercase tracking-[0.22em] font-black text-on-surface-variant mb-2">Sem fidelidade</p>
+<p class="font-headline text-4xl font-extrabold mb-2 text-primary">R$ 97<span class="text-lg font-bold">/mês</span></p>
+<p class="text-sm text-on-surface-variant">Plano pré-pago para quem prefere flexibilidade mensal, sem compromisso de permanência.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Como Funciona Section (Bento Grid) -->
+<section class="py-32 bg-surface-container-low" id="how-it-works">
+<div class="max-w-7xl mx-auto px-8">
+<div class="text-center mb-20">
+<h2 class="font-headline text-4xl font-extrabold tracking-tight mb-4">Fluxo simples para vender no piloto automático</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">Do clique no cardápio até a confirmação da cozinha, cada etapa reduz ruído e ajuda o cliente a concluir o pedido.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-surface-container-lowest p-10 rounded-xl ambient-shadow flex flex-col items-start">
+<div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary">restaurant_menu</span>
+</div>
+<h3 class="font-headline text-xl font-bold mb-4">Cardápio que vende no celular</h3>
+<p class="text-on-surface-variant leading-relaxed">Categorias, busca, destaques, foto, adicionais e carrinho fixo para o cliente pedir sem ficar perdido.</p>
+</div>
+<div class="bg-surface-container-lowest p-10 rounded-xl ambient-shadow flex flex-col items-start md:translate-y-8">
+<div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary">order_approve</span>
+</div>
+<h3 class="font-headline text-xl font-bold mb-4">Checkout com entrega e pagamento</h3>
+<p class="text-on-surface-variant leading-relaxed">Endereço, taxa por distância, retirada, pix online, cartão online ou pagamento na entrega em um fluxo mais profissional.</p>
+</div>
+<div class="bg-surface-container-lowest p-10 rounded-xl ambient-shadow flex flex-col items-start">
+<div class="w-12 h-12 rounded-lg bg-primary-container flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary">distance</span>
+</div>
+<h3 class="font-headline text-xl font-bold mb-4">Painel simples para operar</h3>
+<p class="text-on-surface-variant leading-relaxed">Pedidos, cardápio, clientes, campanhas e configurações em português, com visual premium e foco no que realmente importa no dia a dia.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Demonstração Section -->
+<section class="py-32 bg-surface" id="benefits">
+<div class="max-w-7xl mx-auto px-8">
+<div class="flex flex-col lg:flex-row gap-20 items-center">
+<div class="flex-1 space-y-12">
+<h2 class="font-headline text-4xl font-extrabold tracking-tight">Veja o IzziMenu funcionando na prática</h2>
+<div class="flex gap-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">1</div>
+<div>
+<h4 class="font-bold text-lg mb-2">Cardápio com a cara da sua loja</h4>
+<p class="text-on-surface-variant">Apresente produtos, combos e adicionais de um jeito claro, bonito e muito mais profissional do que pedido solto em conversa.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">2</div>
+<div>
+<h4 class="font-bold text-lg mb-2">Dados para decidir melhor</h4>
+<p class="text-on-surface-variant">Acompanhe pedidos, horários de pico, recorrência e produtos mais vendidos para fazer a operação vender mais.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">3</div>
+<div>
+<h4 class="font-bold text-lg mb-2">Checkout que reduz abandono</h4>
+<p class="text-on-surface-variant">Entrega, retirada e pagamento ficam no mesmo fluxo para o cliente concluir o pedido sem ruído e sem retrabalho para a equipe.</p>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-surface-container-low rounded-3xl p-4 ambient-shadow">
+<div class="bg-surface-container-lowest rounded-2xl p-4 md:p-5">
+<img alt="Preview do painel administrativo do IzziMenu" class="w-full h-auto rounded-[1.25rem] mb-5" src="assets/admin-dashboard-preview.png"/>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<a class="bg-surface-container-low text-on-surface px-4 py-3 rounded-lg font-bold text-center hover:bg-surface-container-high transition-colors" href="admin/dashboard.html">Ver painel</a>
+<a class="bg-surface-container-low text-on-surface px-4 py-3 rounded-lg font-bold text-center hover:bg-surface-container-high transition-colors" href="admin/pedidos.html">Ver pedidos</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Comparativo Section -->
+<section class="py-32 bg-surface-container-low" id="comparison">
+<div class="max-w-5xl mx-auto px-8">
+<div class="text-center mb-16">
+<h2 class="font-headline text-4xl font-extrabold tracking-tight mb-4">Por que sair do amadorismo?</h2>
+<p class="text-on-surface-variant">O WhatsApp é ótimo para conversar, mas péssimo para concentrar toda a operação.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-0 rounded-2xl overflow-hidden ambient-shadow">
+<!-- WhatsApp Side -->
+<div class="bg-surface-container-high p-10">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-on-surface-variant">chat_bubble</span>
+<span class="font-bold text-on-surface-variant uppercase tracking-widest text-sm">Apenas WhatsApp</span>
+</div>
+<ul class="space-y-6">
+<li class="flex items-start gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-error">close</span>
+                                Pedidos perdidos em conversas longas
+                            </li>
+<li class="flex items-start gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-error">close</span>
+                                Erros humanos na anotação manual
+                            </li>
+<li class="flex items-start gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-error">close</span>
+                                Sem histórico de clientes organizado
+                            </li>
+<li class="flex items-start gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-error">close</span>
+                                Dependência total de resposta humana
+                            </li>
+</ul>
+</div>
+<!-- Precision Side -->
+<div class="bg-primary p-10 text-on-primary">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-bold uppercase tracking-widest text-sm">IzziMenu</span>
+</div>
+<ul class="space-y-6">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim">check_circle</span>
+                                Fluxo mais organizado e sem ruído
+                            </li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim">check_circle</span>
+                                Entrega, retirada e pagamento no mesmo fluxo
+                            </li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim">check_circle</span>
+                                Histórico do cliente pronto para remarketing
+                            </li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim">check_circle</span>
+                                Loja pronta para captar pedidos com mais clareza
+                            </li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="py-32 bg-surface" id="faq">
+<div class="max-w-3xl mx-auto px-8">
+<h2 class="font-headline text-3xl font-extrabold tracking-tight mb-12 text-center">Perguntas frequentes</h2>
+<div class="space-y-4">
+<details class="group bg-surface-container-low rounded-lg transition-all overflow-hidden" open="">
+<summary class="flex justify-between items-center p-6 cursor-pointer font-bold list-none">
+                            O cliente precisa instalar aplicativo?
+                            <span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-6 pb-6 text-on-surface-variant leading-relaxed">
+                            Não. O fluxo é web e mobile-first. O cliente entra no cardápio pelo navegador do celular e consegue pedir de forma simples.
+                        </div>
+</details>
+<details class="group bg-surface-container-low rounded-lg transition-all overflow-hidden">
+<summary class="flex justify-between items-center p-6 cursor-pointer font-bold list-none">
+                            O IzziMenu cobra taxa por pedido?
+                            <span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-6 pb-6 text-on-surface-variant leading-relaxed">
+                            Não. A cobrança é mensal. No plano fidelidade de 12 meses via cartão, o valor parte de R$ 49 por mês. Sem fidelidade, o plano pré-pago é R$ 97 por mês.
+                        </div>
+</details>
+<details class="group bg-surface-container-low rounded-lg transition-all overflow-hidden">
+<summary class="flex justify-between items-center p-6 cursor-pointer font-bold list-none">
+                            O sistema aceita retirada e entrega?
+                            <span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-6 pb-6 text-on-surface-variant leading-relaxed">
+                            Sim. O fluxo contempla retirada no balcão, entrega com taxa estimada e métodos de pagamento online ou na entrega.
+                        </div>
+</details>
+<details class="group bg-surface-container-low rounded-lg transition-all overflow-hidden">
+<summary class="flex justify-between items-center p-6 cursor-pointer font-bold list-none">
+                            Como eu recebo a proposta?
+                            <span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-6 pb-6 text-on-surface-variant leading-relaxed">
+                            É só chamar no WhatsApp. A IzziHub apresenta o fluxo, valida seu cenário e monta a proposta comercial do IzziMenu para a sua operação.
+                        </div>
+</details>
+</div>
+</div>
+</section>
+<!-- CTA Final -->
+<section class="py-24 px-8">
+<div class="max-w-5xl mx-auto primary-gradient rounded-3xl p-12 md:p-20 text-center text-on-primary ambient-shadow">
+<h2 class="font-headline text-4xl md:text-5xl font-extrabold mb-8">Leve o IzziMenu para sua loja e tire o pedido do improviso.</h2>
+<p class="text-primary-fixed-dim text-lg mb-10 max-w-2xl mx-auto">Se você quer sair da conversa solta e colocar sua operação em um fluxo bonito, rápido e comercialmente mais forte, esse é o próximo passo.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<a class="bg-surface text-primary px-10 py-4 rounded-sm font-bold text-lg hover:bg-surface-container-lowest transition-colors text-center" href="https://izzihub.com.br/whatsapp.php?src=izzimenu-final&amp;text=Ola%2C%20quero%20uma%20proposta%20do%20IzziMenu%20para%20meu%20delivery.">Falar com a IzziHub</a>
+<a class="border border-on-primary text-on-primary px-10 py-4 rounded-sm font-bold text-lg hover:bg-white/10 transition-colors text-center" href="admin/dashboard.html">Ver painel demo</a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Institutional Adaptation) -->
+<footer class="bg-surface-container-high py-20 px-8">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+<div class="col-span-1 md:col-span-1">
+<img alt="IzziMenu" class="h-11 w-auto mb-6" src="assets/izzimenu-logo.svg"/>
+<p class="text-on-surface-variant text-sm leading-relaxed">Sistema de pedidos online da IzziHub para hamburguerias, lanchonetes e operações que querem vender mais com menos atrito.</p>
+</div>
+<div>
+<h5 class="font-bold mb-6 text-on-surface">Produto</h5>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Funcionalidades</a></li>
+<li><a class="hover:text-primary transition-colors" href="#how-it-works">Como funciona</a></li>
+<li><a class="hover:text-primary transition-colors" href="#pricing">Planos e preços</a></li>
+<li><a class="hover:text-primary transition-colors" href="#benefits">Demonstração</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6 text-on-surface">Recursos</h5>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Central de Ajuda</a></li>
+<li><a class="hover:text-primary transition-colors" href="cardapio.html">Cardápio demo</a></li>
+<li><a class="hover:text-primary transition-colors" href="checkout.html">Checkout demo</a></li>
+<li><a class="hover:text-primary transition-colors" href="admin/dashboard.html">Painel demo</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6 text-on-surface">Legal</h5>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Termos de Uso</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Privacidade</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Cookies</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-8 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-xs text-on-surface-variant">© 2026 IzziMenu. Todos os direitos reservados.</p>
+<div class="flex gap-6">
+<a class="text-on-surface-variant hover:text-primary" href="#"><span class="material-symbols-outlined text-xl">brand_awareness</span></a>
+<a class="text-on-surface-variant hover:text-primary" href="#"><span class="material-symbols-outlined text-xl">public</span></a>
+<a class="text-on-surface-variant hover:text-primary" href="#"><span class="material-symbols-outlined text-xl">share</span></a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
+
+
+
