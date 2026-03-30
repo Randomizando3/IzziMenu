@@ -144,13 +144,77 @@
     return match ? match.href : "/admin/dashboard.html";
   }
 
-  function standardizeAdminTopMenu() {
-    var header = document.querySelector("header");
-    if (!header) {
+  function getAdminTopBar() {
+    return Array.from(document.querySelectorAll("header, nav")).find(function (element) {
+      return (
+        !element.classList.contains("izzimenu-demo-nav") &&
+        !/bottom-0/.test(element.className) &&
+        /sticky|top-0|h-16/.test(element.className)
+      );
+    });
+  }
+
+  function standardizeAdminBrand(topBar) {
+    if (!topBar) {
       return;
     }
 
-    var candidates = Array.from(header.querySelectorAll(".hidden.md\\:flex, .hidden.lg\\:flex, nav.hidden.md\\:flex, nav.hidden.lg\\:flex")).filter(function (element) {
+    var leftGroup = Array.from(topBar.children).find(function (child) {
+      return /izzimenu|visao geral|pedidos|cardapio|clientes|configuracoes/.test(normalize(child.textContent));
+    });
+    if (leftGroup) {
+      var brandCandidate = Array.from(leftGroup.children).find(function (child) {
+        return /izzimenu/.test(normalize(child.textContent)) || child.querySelector("img");
+      });
+
+      if (brandCandidate) {
+        var brand = document.createElement("a");
+        brand.className = "izzimenu-admin-header-brand";
+        brand.href = "/index.html";
+        brand.innerHTML = "<img alt=\"IzziMenu\" src=\"/assets/izzimenu.png\" />";
+        brandCandidate.replaceWith(brand);
+      }
+    }
+
+    var aside = document.querySelector("aside");
+    if (!aside) {
+      return;
+    }
+
+    var sideNav = Array.from(aside.children).find(function (child) {
+      return child.tagName === "NAV" && /visao geral|resumo|pedidos|cardapio|clientes|configuracoes|fleet|reports/i.test(normalize(child.textContent));
+    });
+
+    var footer = Array.from(aside.children).find(function (child) {
+      return /ajuda|novo pedido/.test(normalize(child.textContent));
+    });
+
+    var intro = Array.from(aside.children).find(function (child) {
+      return child !== sideNav && child !== footer && /painel da loja|operacao do restaurante|izzimenu/.test(normalize(child.textContent));
+    });
+
+    if (!intro) {
+      intro = document.createElement("a");
+      if (sideNav) {
+        aside.insertBefore(intro, sideNav);
+      } else {
+        aside.insertBefore(intro, aside.firstChild);
+      }
+    }
+
+    intro.className = "izzimenu-admin-side-brand";
+    intro.href = "/index.html";
+    intro.innerHTML =
+      "<img alt=\"IzziMenu\" src=\"/assets/izzimenu.png\" />" +
+      "<span>Painel Demo do Delivery</span>";
+  }
+
+  function standardizeAdminTopMenu(topBar) {
+    if (!topBar) {
+      return;
+    }
+
+    var candidates = Array.from(topBar.querySelectorAll(".hidden.md\\:flex, .hidden.lg\\:flex, nav.hidden.md\\:flex, nav.hidden.lg\\:flex")).filter(function (element) {
       return /visao geral|resumo|pedidos|cardapio|clientes|configuracoes|fleet|reports/i.test(normalize(element.textContent));
     });
 
@@ -255,7 +319,9 @@
   document.body.appendChild(makeBackButton());
 
   if (isAdmin) {
-    standardizeAdminTopMenu();
+    var adminTopBar = getAdminTopBar();
+    standardizeAdminBrand(adminTopBar);
+    standardizeAdminTopMenu(adminTopBar);
     standardizeAdminSidebar();
     standardizeAdminBottomNav();
   }
