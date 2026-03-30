@@ -348,6 +348,78 @@
     }
   }
 
+  function standardizeAdminContent(topBar) {
+    var main = document.querySelector("main");
+    if (!main) {
+      return;
+    }
+
+    var needsContentWrapper = [
+      "p-8",
+      "p-6",
+      "md:p-12",
+      "space-y-8",
+      "pb-24",
+      "max-w-7xl",
+      "mx-auto",
+      "w-full"
+    ].some(function (className) {
+      return main.classList.contains(className);
+    });
+
+    if (!needsContentWrapper) {
+      return;
+    }
+
+    var content = Array.from(main.children).find(function (child) {
+      return child.classList && child.classList.contains("izzimenu-admin-content");
+    });
+
+    if (!content) {
+      content = document.createElement("div");
+      content.className = "izzimenu-admin-content";
+
+      if (main.classList.contains("max-w-7xl")) {
+        content.classList.add("izzimenu-admin-content--wide");
+      } else {
+        content.classList.add("izzimenu-admin-content--default");
+      }
+
+      if (main.classList.contains("space-y-8")) {
+        content.classList.add("izzimenu-admin-content--stacked");
+      }
+
+      if (main.classList.contains("pb-24")) {
+        content.classList.add("izzimenu-admin-content--bottom-space");
+      }
+
+      if (main.classList.contains("p-6") || main.classList.contains("md:p-12")) {
+        content.classList.add("izzimenu-admin-content--roomy");
+      }
+
+      Array.from(main.children).forEach(function (child) {
+        if (child !== topBar) {
+          content.appendChild(child);
+        }
+      });
+
+      main.appendChild(content);
+    }
+
+    [
+      "p-8",
+      "p-6",
+      "md:p-12",
+      "space-y-8",
+      "pb-24",
+      "max-w-7xl",
+      "mx-auto",
+      "w-full"
+    ].forEach(function (className) {
+      main.classList.remove(className);
+    });
+  }
+
   function standardizeAdminSidebar() {
     var aside = document.querySelector("aside");
     if (!aside) {
@@ -501,6 +573,7 @@
   if (isAdmin) {
     var adminTopBar = placeAdminTopBar(getAdminTopBar());
     standardizeAdminShell();
+    standardizeAdminContent(adminTopBar);
     standardizeAdminBrand(adminTopBar);
     standardizeAdminTopMenu(adminTopBar);
     standardizeAdminSidebar();
