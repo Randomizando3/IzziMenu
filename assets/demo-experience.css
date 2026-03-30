@@ -206,6 +206,11 @@ body.izzimenu-demo-admin {
   -webkit-backdrop-filter: blur(12px);
 }
 
+.izzimenu-admin-topbar--offset {
+  margin-left: 16rem;
+  width: calc(100% - 16rem);
+}
+
 .izzimenu-admin-top-menu a {
   color: #566166;
   font-family: "Manrope", sans-serif;
@@ -481,6 +486,11 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
 @media (max-width: 1024px) {
   .izzimenu-demo-nav__note {
     display: none;
+  }
+
+  .izzimenu-admin-topbar--offset {
+    margin-left: 0;
+    width: 100%;
   }
 }
 
