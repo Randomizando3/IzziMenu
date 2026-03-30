@@ -5,6 +5,13 @@
 
   var currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
   var isAdmin = document.body.classList.contains("izzimenu-demo-admin");
+  var adminItems = [
+    { href: "/admin/dashboard.html", label: "Visão Geral", icon: "dashboard" },
+    { href: "/admin/pedidos.html", label: "Pedidos", icon: "package_2" },
+    { href: "/admin/cardapio.html", label: "Cardápio", icon: "restaurant_menu" },
+    { href: "/admin/clientes.html", label: "Clientes", icon: "group" },
+    { href: "/admin/configuracoes.html", label: "Configurações", icon: "settings" }
+  ];
   var pages = [
     { href: "/cardapio.html", label: "Cardapio" },
     { href: "/checkout.html", label: "Checkout" },
@@ -130,11 +137,128 @@
     });
   }
 
+  function getActiveAdminHref() {
+    var match = adminItems.find(function (item) {
+      return item.href === currentPath;
+    });
+    return match ? match.href : "/admin/dashboard.html";
+  }
+
+  function standardizeAdminTopMenu() {
+    var header = document.querySelector("header");
+    if (!header) {
+      return;
+    }
+
+    var candidates = Array.from(header.querySelectorAll(".hidden.md\\:flex, .hidden.lg\\:flex, nav.hidden.md\\:flex, nav.hidden.lg\\:flex")).filter(function (element) {
+      return /visao geral|resumo|pedidos|cardapio|clientes|configuracoes|fleet|reports/i.test(normalize(element.textContent));
+    });
+
+    var container = candidates.sort(function (left, right) {
+      return left.textContent.length - right.textContent.length;
+    })[0];
+    if (!container) {
+      return;
+    }
+
+    var visibilityClass = container.className.indexOf("lg:flex") !== -1 ? "hidden lg:flex" : "hidden md:flex";
+    var extraClass = container.className.indexOf("ml-8") !== -1 ? " ml-8" : "";
+    container.className = "izzimenu-admin-top-menu " + visibilityClass + extraClass;
+    container.innerHTML = adminItems.map(function (item) {
+      var active = item.href === getActiveAdminHref() ? " is-active" : "";
+      return "<a class=\"" + active.trim() + "\" href=\"" + item.href + "\">" + item.label + "</a>";
+    }).join("");
+  }
+
+  function standardizeAdminSidebar() {
+    var aside = document.querySelector("aside");
+    if (!aside) {
+      return;
+    }
+
+    var sideNav = Array.from(aside.children).find(function (child) {
+      return child.tagName === "NAV" && /visao geral|resumo|pedidos|cardapio|clientes|configuracoes|fleet|reports/i.test(normalize(child.textContent));
+    });
+
+    var footer = Array.from(aside.children).find(function (child) {
+      return /ajuda|novo pedido/.test(normalize(child.textContent));
+    });
+
+    if (!sideNav) {
+      sideNav = document.createElement("nav");
+      if (footer) {
+        aside.insertBefore(sideNav, footer);
+      } else {
+        aside.appendChild(sideNav);
+      }
+    }
+
+    Array.from(aside.children).forEach(function (child) {
+      if (child.tagName === "A" && child !== footer) {
+        child.remove();
+      }
+    });
+
+    sideNav.className = "izzimenu-admin-side-nav flex-1";
+    sideNav.innerHTML = adminItems.map(function (item) {
+      var active = item.href === getActiveAdminHref() ? " is-active" : "";
+      return (
+        "<a class=\"" + active.trim() + "\" href=\"" + item.href + "\">" +
+        "<span class=\"material-symbols-outlined\">" + item.icon + "</span>" +
+        "<span>" + item.label + "</span>" +
+        "</a>"
+      );
+    }).join("");
+
+    if (!footer) {
+      footer = document.createElement("div");
+      aside.appendChild(footer);
+    }
+
+    footer.className = "izzimenu-admin-side-footer";
+    footer.innerHTML =
+      "<a class=\"izzimenu-help-link\" href=\"/index.html#faq\">" +
+      "<span class=\"material-symbols-outlined\">help</span>" +
+      "<span>Ajuda</span>" +
+      "</a>" +
+      "<a class=\"izzimenu-new-order\" href=\"/cardapio.html\">" +
+      "<span class=\"material-symbols-outlined\">add</span>" +
+      "<span>Novo Pedido</span>" +
+      "</a>";
+  }
+
+  function standardizeAdminBottomNav() {
+    var bottomNav = Array.from(document.querySelectorAll("body > nav")).find(function (nav) {
+      return nav !== document.querySelector(".izzimenu-demo-nav") && /bottom-0/.test(nav.className);
+    });
+
+    if (!bottomNav) {
+      return;
+    }
+
+    bottomNav.classList.add("izzimenu-admin-bottom-nav");
+    bottomNav.innerHTML = adminItems.slice(0, 4).map(function (item) {
+      var active = item.href === getActiveAdminHref() ? " is-active" : "";
+      return (
+        "<a class=\"" + active.trim() + "\" href=\"" + item.href + "\">" +
+        "<span class=\"material-symbols-outlined\">" + item.icon + "</span>" +
+        "<span>" + item.label + "</span>" +
+        "</a>"
+      );
+    }).join("");
+  }
+
   document.body.prepend(makeBanner());
   if (!isAdmin) {
     document.body.prepend(makeNav());
   }
   document.body.appendChild(makeBackButton());
+
+  if (isAdmin) {
+    standardizeAdminTopMenu();
+    standardizeAdminSidebar();
+    standardizeAdminBottomNav();
+  }
 
   patchAnchorByText(document.querySelector("aside"));
   patchAnchorByText(document.querySelector("header"));
