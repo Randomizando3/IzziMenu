@@ -96,11 +96,11 @@
 <div class="flex items-center gap-8">
 <span class="text-xl font-bold text-[#2a3439] tracking-tighter">IzziMenu</span>
 <nav class="hidden md:flex items-center gap-6">
-<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Visão Geral</a>
-<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Pedidos</a>
-<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Cardápio</a>
-<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Fleet</a>
-<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="#">Reports</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="/admin/dashboard.html">Visão Geral</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="/admin/pedidos.html">Pedidos</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="/admin/cardapio.html">Cardápio</a>
+<a class="text-[#565e74] border-b-2 border-[#565e74] pb-1" href="/admin/clientes.html">Clientes</a>
+<a class="text-[#566166] hover:bg-[#f0f4f7] transition-colors" href="/admin/configuracoes.html">Configurações</a>
 </nav>
 </div>
 <div class="flex items-center gap-4">
@@ -122,26 +122,26 @@
 <h2 class="text-lg font-black text-[#2a3439]">Painel da Loja</h2>
 <p class="text-xs text-on-surface-variant">Operação do Restaurante</p>
 </div>
-<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="/admin/dashboard.html">
 <span class="material-symbols-outlined">dashboard</span> Resumo
             </a>
-<a class="flex items-center gap-3 p-3 bg-[#ffffff] text-[#2a3439] rounded-lg shadow-sm translate-x-1" href="#">
-<span class="material-symbols-outlined">group</span> Customers
+<a class="flex items-center gap-3 p-3 bg-[#ffffff] text-[#2a3439] rounded-lg shadow-sm translate-x-1" href="/admin/clientes.html">
+<span class="material-symbols-outlined">group</span> Clientes
             </a>
-<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
-<span class="material-symbols-outlined">local_shipping</span> Expedição
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="/admin/pedidos.html">
+<span class="material-symbols-outlined">package_2</span> Pedidos
             </a>
-<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
-<span class="material-symbols-outlined">analytics</span> Relatórios
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="/admin/cardapio.html">
+<span class="material-symbols-outlined">restaurant_menu</span> Cardápio
             </a>
-<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="#">
-<span class="material-symbols-outlined">campaign</span> Campaigns
+<a class="flex items-center gap-3 p-3 text-[#566166] hover:bg-[#d9e4ea] rounded-lg transition-transform" href="/admin/configuracoes.html">
+<span class="material-symbols-outlined">settings</span> Configurações
             </a>
 <div class="mt-auto pt-4 border-t border-outline-variant/10">
 <button class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
 <span class="material-symbols-outlined">add</span> Novo Pedido
                 </button>
-<a class="flex items-center gap-3 p-3 mt-4 text-[#566166] hover:bg-[#d9e4ea] rounded-lg" href="#">
+<a class="flex items-center gap-3 p-3 mt-4 text-[#566166] hover:bg-[#d9e4ea] rounded-lg" href="/index.html#faq">
 <span class="material-symbols-outlined">help</span> Ajuda
                 </a>
 </div>
@@ -417,21 +417,21 @@ The Delivery Team</textarea>
 </div>
 <!-- Mobile BottomNavBar -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-4 pb-safe bg-[#f7f9fb]/80 dark:bg-slate-900/80 backdrop-blur-md z-50 border-t border-[#a9b4b9]/20 shadow-[0_-4px_12px_rgba(42,52,57,0.05)]">
-<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="#">
+<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="/admin/dashboard.html">
 <span class="material-symbols-outlined">home</span>
 <span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-[#565e74] scale-110" href="#">
+<a class="flex flex-col items-center justify-center text-[#565e74] scale-110" href="/admin/clientes.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
-<span class="text-[10px] font-bold uppercase tracking-wider">CRM</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Clientes</span>
 </a>
-<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="#">
-<span class="material-symbols-outlined">campaign</span>
-<span class="text-[10px] font-bold uppercase tracking-wider">Ads</span>
+<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="/admin/pedidos.html">
+<span class="material-symbols-outlined">package_2</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Pedidos</span>
 </a>
-<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="#">
-<span class="material-symbols-outlined">person</span>
-<span class="text-[10px] font-bold uppercase tracking-wider">Account</span>
+<a class="flex flex-col items-center justify-center text-[#566166] hover:opacity-80" href="/admin/configuracoes.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Config</span>
 </a>
 </nav>
 <script defer src="/assets/demo-experience.js"></script>
