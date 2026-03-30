@@ -36,8 +36,13 @@
     var banner = document.createElement("div");
     banner.className = "izzimenu-demo-banner";
     banner.innerHTML =
+      "<div class=\"izzimenu-demo-banner__inner\">" +
+      "<div class=\"izzimenu-demo-banner__copy\">" +
       "<span>Acesso demo ao sistema</span>" +
-      "<span class=\"izzimenu-demo-banner__hint\">Dados ilustrativos para navegacao comercial</span>";
+      "<span class=\"izzimenu-demo-banner__hint\">Dados ilustrativos para navegacao comercial</span>" +
+      "</div>" +
+      "<a class=\"izzimenu-demo-banner__link\" href=\"/index.html\">Voltar ao site</a>" +
+      "</div>";
     return banner;
   }
 
@@ -66,16 +71,6 @@
       "</div>";
 
     return nav;
-  }
-
-  function makeBackButton() {
-    var back = document.createElement("a");
-    back.className = "izzimenu-demo-back";
-    back.href = "/index.html";
-    back.innerHTML =
-      "<span class=\"izzimenu-demo-back__icon\">&#8592;</span>" +
-      "<span>Voltar para o site</span>";
-    return back;
   }
 
   function patchAnchorByText(scope) {
@@ -387,7 +382,6 @@
   if (!isAdmin) {
     document.body.prepend(makeNav());
   }
-  document.body.appendChild(makeBackButton());
 
   if (isAdmin) {
     var adminTopBar = getAdminTopBar();
