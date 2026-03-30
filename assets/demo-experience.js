@@ -5,6 +5,7 @@
 
   var currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
   var isAdmin = document.body.classList.contains("izzimenu-demo-admin");
+  var adminAvatarSrc = "https://lh3.googleusercontent.com/aida-public/AB6AXuAscL_y2vZ2hK4zorKY6_xapfKox3G155xsLIbeYhMdAaHQcWwactA6tudZNao7Z_waNjqo32SVJzQbPz7wg7eVh4m0ECymWEfK5hYs05fXpkQn33b1pYksBo7a2be3Rj7cI2A6e_PPhsuLBiNKUlTifduULtob_R-SaTjq1swFNwzRbPbp5XNM2R42DeBS547xeu5G-1FjngJigt5ByZ_F0dsuyVYckCsgGG2QocW-MHHAuDvyvFXfGcAlXIxoNZ7N0N25zbAW7Q";
   var adminItems = [
     { href: "/admin/dashboard.html", label: "Visão Geral", icon: "dashboard" },
     { href: "/admin/pedidos.html", label: "Pedidos", icon: "package_2" },
@@ -155,27 +156,6 @@
   }
 
   function standardizeAdminBrand(topBar) {
-    if (!topBar) {
-      return;
-    }
-
-    var leftGroup = Array.from(topBar.children).find(function (child) {
-      return /izzimenu|visao geral|pedidos|cardapio|clientes|configuracoes/.test(normalize(child.textContent));
-    });
-    if (leftGroup) {
-      var brandCandidate = Array.from(leftGroup.children).find(function (child) {
-        return /izzimenu/.test(normalize(child.textContent)) || child.querySelector("img");
-      });
-
-      if (brandCandidate) {
-        var brand = document.createElement("a");
-        brand.className = "izzimenu-admin-header-brand";
-        brand.href = "/index.html";
-        brand.innerHTML = "<img alt=\"IzziMenu\" src=\"/assets/izzimenu.png\" />";
-        brandCandidate.replaceWith(brand);
-      }
-    }
-
     var aside = document.querySelector("aside");
     if (!aside) {
       return;
@@ -214,6 +194,43 @@
       return;
     }
 
+    topBar.className = "izzimenu-admin-topbar sticky top-0 z-30 flex justify-between items-center w-full px-8 h-16";
+
+    var childElements = Array.from(topBar.children).filter(function (child) {
+      return child.nodeType === 1;
+    });
+
+    var leftGroup = childElements.find(function (child) {
+      return /izzimenu|visao geral|pedidos|cardapio|clientes|configuracoes/.test(normalize(child.textContent));
+    });
+
+    var rightGroup = childElements.find(function (child) {
+      return child !== leftGroup;
+    });
+
+    if (!leftGroup) {
+      leftGroup = document.createElement("div");
+      topBar.prepend(leftGroup);
+    }
+
+    if (!rightGroup) {
+      rightGroup = document.createElement("div");
+      topBar.appendChild(rightGroup);
+    }
+
+    leftGroup.className = "flex items-center gap-6";
+    rightGroup.className = "izzimenu-admin-top-actions";
+
+    Array.from(leftGroup.children).forEach(function (child) {
+      if (child.tagName === "NAV") {
+        return;
+      }
+
+      if (/izzimenu/.test(normalize(child.textContent)) || child.querySelector("img")) {
+        child.remove();
+      }
+    });
+
     var candidates = Array.from(topBar.querySelectorAll(".hidden.md\\:flex, .hidden.lg\\:flex, nav.hidden.md\\:flex, nav.hidden.lg\\:flex")).filter(function (element) {
       return /visao geral|resumo|pedidos|cardapio|clientes|configuracoes|fleet|reports/i.test(normalize(element.textContent));
     });
@@ -222,16 +239,66 @@
       return left.textContent.length - right.textContent.length;
     })[0];
     if (!container) {
-      return;
+      container = document.createElement("nav");
+      leftGroup.appendChild(container);
     }
 
-    var visibilityClass = container.className.indexOf("lg:flex") !== -1 ? "hidden lg:flex" : "hidden md:flex";
-    var extraClass = container.className.indexOf("ml-8") !== -1 ? " ml-8" : "";
-    container.className = "izzimenu-admin-top-menu " + visibilityClass + extraClass;
+    container.className = "izzimenu-admin-top-menu hidden lg:flex";
     container.innerHTML = adminItems.map(function (item) {
       var active = item.href === getActiveAdminHref() ? " is-active" : "";
       return "<a class=\"" + active.trim() + "\" href=\"" + item.href + "\">" + item.label + "</a>";
     }).join("");
+
+    var searchWrapper = Array.from(rightGroup.children).find(function (child) {
+      return child.querySelector && child.querySelector("input");
+    });
+
+    if (!searchWrapper) {
+      searchWrapper = document.createElement("div");
+      rightGroup.prepend(searchWrapper);
+    }
+
+    searchWrapper.className = "izzimenu-admin-search hidden sm:block";
+    searchWrapper.innerHTML =
+      "<span class=\"material-symbols-outlined\">search</span>" +
+      "<input aria-label=\"Buscar pedidos\" placeholder=\"Buscar pedidos...\" type=\"text\" />";
+
+    Array.from(rightGroup.children).forEach(function (child) {
+      if (child === searchWrapper) {
+        return;
+      }
+
+      if (/settings/.test(normalize(child.textContent))) {
+        child.remove();
+      }
+    });
+
+    var notificationButton = Array.from(rightGroup.children).find(function (child) {
+      return /notifications/.test(normalize(child.textContent));
+    });
+
+    if (!notificationButton) {
+      notificationButton = document.createElement("a");
+      rightGroup.appendChild(notificationButton);
+    }
+
+    notificationButton.className = "izzimenu-admin-icon-btn";
+    notificationButton.href = "#";
+    notificationButton.innerHTML =
+      "<span class=\"material-symbols-outlined\">notifications</span>" +
+      "<span class=\"izzimenu-admin-icon-dot\"></span>";
+
+    var avatar = Array.from(rightGroup.children).find(function (child) {
+      return child !== notificationButton && child.querySelector && child.querySelector("img");
+    });
+
+    if (!avatar) {
+      avatar = document.createElement("div");
+      rightGroup.appendChild(avatar);
+    }
+
+    avatar.className = "izzimenu-admin-avatar";
+    avatar.innerHTML = "<img alt=\"Admin Profile\" src=\"" + adminAvatarSrc + "\" />";
   }
 
   function standardizeAdminSidebar() {
