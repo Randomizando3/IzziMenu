@@ -3212,13 +3212,21 @@
     var draftSettings = cloneData(savedSettings);
     var activeTab = "dados da loja";
 
-    if (!main || !storeSection || !hoursSection || !hoursHeader || !hoursList || !deliverySection || !paymentsCard || !actionsCard || !statusCard) {
+    if (!main || !storeSection || !hoursSection || !hoursHeader || !hoursList || !deliverySection || !paymentsCard || !actionsCard) {
       return;
     }
 
     if (tabsContainer) {
       tabsContainer.classList.add("izzimenu-demo-chip-cloud");
     }
+
+    if (statusCard) {
+      statusCard.remove();
+    }
+
+    deliverySection.after(paymentsCard);
+    paymentsCard.classList.add("izzimenu-config-payments-card");
+    actionsCard.classList.add("izzimenu-config-actions-card");
 
     function getSectionByTab(tabLabel) {
       var key = normalize(tabLabel);
@@ -3302,22 +3310,22 @@
       var canRemove = draftSettings.hours.length > 1;
 
       return (
-        "<div class=\"flex flex-wrap items-center justify-between gap-4 p-4 rounded-lg group " + (isEnabled ? "bg-surface-container-lowest" : "bg-surface-container-high/50 opacity-60") + "\" data-schedule-row=\"" + index + "\">" +
-        "<div class=\"flex items-center gap-3 min-w-[11rem] flex-1 sm:flex-none sm:w-40\">" +
+        "<div class=\"izzimenu-schedule-row group " + (isEnabled ? "bg-surface-container-lowest" : "bg-surface-container-high/50 opacity-60") + "\" data-schedule-row=\"" + index + "\">" +
+        "<div class=\"izzimenu-schedule-label\">" +
         "<div class=\"w-3 h-3 rounded-full " + (isEnabled ? "bg-primary" : "bg-outline-variant") + "\"></div>" +
         "<input type=\"text\" value=\"" + escapeHtml(schedule.label) + "\" placeholder=\"Novo horario\" data-schedule-field=\"label\" data-schedule-index=\"" + index + "\" class=\"w-full bg-transparent border-none rounded px-0 py-1 text-sm font-bold text-on-surface focus:ring-0 placeholder:text-on-surface-variant\" />" +
         "</div>" +
-        "<div class=\"flex items-center gap-3 flex-1 justify-start min-w-[14rem]\">" +
+        "<div class=\"izzimenu-schedule-times\">" +
         "<input class=\"bg-surface-container border-none rounded px-2 py-1 text-sm font-medium focus:ring-primary/20\" type=\"time\" value=\"" + escapeHtml(schedule.opensAt) + "\" data-schedule-field=\"opensAt\" data-schedule-index=\"" + index + "\"" + (isEnabled ? "" : " disabled") + " />" +
         "<span class=\"text-outline-variant\">as</span>" +
         "<input class=\"bg-surface-container border-none rounded px-2 py-1 text-sm font-medium focus:ring-primary/20\" type=\"time\" value=\"" + escapeHtml(schedule.closesAt) + "\" data-schedule-field=\"closesAt\" data-schedule-index=\"" + index + "\"" + (isEnabled ? "" : " disabled") + " />" +
         "</div>" +
-        "<div class=\"flex items-center gap-3 ml-auto\">" +
-        (canRemove ? "<button type=\"button\" data-schedule-action=\"remove\" data-schedule-index=\"" + index + "\" class=\"inline-flex items-center justify-center w-9 h-9 rounded-full bg-surface-container text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors\" title=\"Excluir horario\"><span class=\"material-symbols-outlined text-base\">delete</span></button>" : "") +
+        "<div class=\"izzimenu-schedule-controls\">" +
         "<span class=\"text-[10px] font-black uppercase " + (isEnabled ? "text-primary" : "text-on-surface-variant") + "\">" + (isEnabled ? "Aberto" : "Fechado") + "</span>" +
         "<button type=\"button\" data-schedule-toggle=\"true\" data-schedule-index=\"" + index + "\" class=\"w-10 h-5 rounded-full relative cursor-pointer transition-colors " + (isEnabled ? "bg-primary/20" : "bg-outline-variant/20") + "\" aria-label=\"" + (isEnabled ? "Fechar horario" : "Abrir horario") + "\">" +
         "<div class=\"absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all " + (isEnabled ? "right-0.5 bg-primary" : "left-0.5 bg-outline-variant") + "\"></div>" +
         "</button>" +
+        (canRemove ? "<button type=\"button\" data-schedule-action=\"remove\" data-schedule-index=\"" + index + "\" class=\"izzimenu-schedule-remove\" title=\"Excluir horario\"><span class=\"material-symbols-outlined text-base\">delete</span></button>" : "") +
         "</div>" +
         "</div>"
       );
@@ -3388,23 +3396,7 @@
     }
 
     function renderStatusCard() {
-      var visibility = calculateStoreVisibility(draftSettings);
-      var valueHeading = statusCard.querySelector("h4");
-      var statusText = statusCard.querySelector("p");
-      var trendIcon = statusCard.querySelector(".material-symbols-outlined");
-
-      if (valueHeading) {
-        valueHeading.textContent = visibility.toFixed(1) + "%";
-      }
-      if (statusText) {
-        statusText.textContent = draftSettings.unitActive
-          ? "Loja operacional. Ajustes desta demo ficam salvos neste navegador."
-          : "Loja pausada na demo. Reative a unidade para voltar a exibir pagamentos e horarios.";
-      }
-      if (trendIcon) {
-        trendIcon.textContent = draftSettings.unitActive ? "trending_up" : "pause_circle";
-        trendIcon.className = "material-symbols-outlined " + (draftSettings.unitActive ? "text-green-300" : "text-amber-200");
-      }
+      return;
     }
 
     function renderActionsCard() {
