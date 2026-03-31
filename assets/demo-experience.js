@@ -29,6 +29,7 @@
   var cartStateKey = "izzimenu-demo-cart-v2";
   var catalogStateKey = "izzimenu-demo-catalog-v2";
   var customersStateKey = "izzimenu-demo-customers-v2";
+  var settingsStateKey = "izzimenu-demo-settings-v1";
   var orderStatusFlow = ["Novo", "Em preparo", "Saiu para entrega", "Concluído", "Cancelado"];
   var defaultDemoOrders = [
     {
@@ -285,6 +286,38 @@
       ]
     }
   ];
+  var defaultDemoSettings = {
+    storeName: "IzziMenu - Central SP",
+    cnpj: "12.345.678/0001-99",
+    address: "Avenida Paulista, 1000 - Bela Vista, Sao Paulo - SP",
+    phone: "(11) 99988-7766",
+    supportEmail: "contato@izzihub.com.br",
+    unitActive: true,
+    hours: [
+      { id: "segunda", label: "Segunda", opensAt: "08:00", closesAt: "18:00", enabled: true },
+      { id: "terca-sexta", label: "Terca - Sexta", opensAt: "08:00", closesAt: "18:00", enabled: true },
+      { id: "sabado", label: "Sabado", opensAt: "09:00", closesAt: "13:00", enabled: false }
+    ],
+    delivery: {
+      baseFee: 7.5,
+      feePerKm: 1.2,
+      maxRadius: 15,
+      minimumOrder: 35
+    },
+    payments: {
+      pix: {
+        enabled: true,
+        key: "contato@izzihub.com.br",
+        webhookConfigured: true,
+        webhookLabel: "Webhook conectado"
+      },
+      card: {
+        enabled: true,
+        provider: "Mercado Pago",
+        connected: true
+      }
+    }
+  };
   var demoOrders = [];
   var defaultNotifications = [
     {
@@ -496,6 +529,154 @@
     return normalize(text).replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
   }
 
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function createDemoOption(name, price, id) {
+    var safeName = (name || "").trim() || "Nova opcao";
+    return {
+      id: id || slugify(safeName + "-" + String(price || 0)),
+      name: safeName,
+      price: Number(price || 0)
+    };
+  }
+
+  function createDemoOptionGroup(name, min, max, options, id) {
+    var safeName = (name || "").trim() || "Novo grupo";
+    var safeMin = Math.max(0, Number(min || 0));
+    var safeMax = Math.max(safeMin, Number(max || safeMin || 1));
+    return {
+      id: id || slugify(safeName),
+      name: safeName,
+      min: safeMin,
+      max: safeMax,
+      options: (options || []).map(function (option, index) {
+        return createDemoOption(option.name, option.price, option.id || slugify(safeName + "-" + index));
+      })
+    };
+  }
+
+  function getDefaultOptionGroups(product) {
+    if (!product || normalize(product.category) !== "hamburgueres") {
+      return [];
+    }
+
+    return [
+      createDemoOptionGroup("Ponto da carne", 1, 1, [
+        { name: "Mal passado", price: 0 },
+        { name: "Ao ponto", price: 0 },
+        { name: "Bem passado", price: 0 }
+      ], "ponto-da-carne"),
+      createDemoOptionGroup("Turbine seu burger", 0, 3, [
+        { name: "Bacon extra", price: 5.5 },
+        { name: "Cheddar extra", price: 4.5 },
+        { name: "Molho da casa", price: 2.5 }
+      ], "turbine-seu-burger")
+    ];
+  }
+
+  function normalizeOptionGroup(group, index) {
+    var baseGroup = group || {};
+    var safeName = (baseGroup.name || "").trim() || "Grupo " + (index + 1);
+    var options = Array.isArray(baseGroup.options) ? baseGroup.options.map(function (option, optionIndex) {
+      return createDemoOption(option && option.name, option && option.price, option && option.id || slugify(safeName + "-" + optionIndex));
+    }) : [];
+    var safeMin = Math.max(0, Number(baseGroup.min || 0));
+    var safeMax = Math.max(safeMin, Number(baseGroup.max || (safeMin || Math.max(options.length, 1))));
+
+    return {
+      id: baseGroup.id || slugify(safeName + "-" + index),
+      name: safeName,
+      min: safeMin,
+      max: safeMax,
+      options: options
+    };
+  }
+
+  function normalizeCatalogItems(items) {
+    return (items || []).map(function (product) {
+      var normalizedProduct = cloneData(product);
+      normalizedProduct.optionGroups = Array.isArray(normalizedProduct.optionGroups) && normalizedProduct.optionGroups.length
+        ? normalizedProduct.optionGroups.map(normalizeOptionGroup)
+        : getDefaultOptionGroups(normalizedProduct);
+      return normalizedProduct;
+    });
+  }
+
+  function normalizeSettingsState(settings) {
+    var source = settings || {};
+    var delivery = source.delivery || {};
+    var payments = source.payments || {};
+    var pix = payments.pix || {};
+    var card = payments.card || {};
+    var hours = Array.isArray(source.hours) && source.hours.length ? source.hours : defaultDemoSettings.hours;
+
+    return {
+      storeName: source.storeName || defaultDemoSettings.storeName,
+      cnpj: source.cnpj || defaultDemoSettings.cnpj,
+      address: source.address || defaultDemoSettings.address,
+      phone: source.phone || defaultDemoSettings.phone,
+      supportEmail: source.supportEmail || defaultDemoSettings.supportEmail,
+      unitActive: typeof source.unitActive === "boolean" ? source.unitActive : defaultDemoSettings.unitActive,
+      hours: hours.map(function (entry, index) {
+        var baseEntry = entry || {};
+        var fallback = defaultDemoSettings.hours[index] || defaultDemoSettings.hours[defaultDemoSettings.hours.length - 1];
+        return {
+          id: baseEntry.id || fallback.id,
+          label: baseEntry.label || fallback.label,
+          opensAt: baseEntry.opensAt || fallback.opensAt,
+          closesAt: baseEntry.closesAt || fallback.closesAt,
+          enabled: typeof baseEntry.enabled === "boolean" ? baseEntry.enabled : fallback.enabled
+        };
+      }),
+      delivery: {
+        baseFee: Number(delivery.baseFee != null ? delivery.baseFee : defaultDemoSettings.delivery.baseFee),
+        feePerKm: Number(delivery.feePerKm != null ? delivery.feePerKm : defaultDemoSettings.delivery.feePerKm),
+        maxRadius: Number(delivery.maxRadius != null ? delivery.maxRadius : defaultDemoSettings.delivery.maxRadius),
+        minimumOrder: Number(delivery.minimumOrder != null ? delivery.minimumOrder : defaultDemoSettings.delivery.minimumOrder)
+      },
+      payments: {
+        pix: {
+          enabled: typeof pix.enabled === "boolean" ? pix.enabled : defaultDemoSettings.payments.pix.enabled,
+          key: pix.key || defaultDemoSettings.payments.pix.key,
+          webhookConfigured: typeof pix.webhookConfigured === "boolean" ? pix.webhookConfigured : defaultDemoSettings.payments.pix.webhookConfigured,
+          webhookLabel: pix.webhookLabel || defaultDemoSettings.payments.pix.webhookLabel
+        },
+        card: {
+          enabled: typeof card.enabled === "boolean" ? card.enabled : defaultDemoSettings.payments.card.enabled,
+          provider: card.provider || defaultDemoSettings.payments.card.provider,
+          connected: typeof card.connected === "boolean" ? card.connected : defaultDemoSettings.payments.card.connected
+        }
+      }
+    };
+  }
+
+  function calculateStoreVisibility(settings) {
+    var score = 55;
+    if (settings.unitActive) {
+      score += 20;
+    }
+    score += Math.min(settings.hours.filter(function (entry) { return entry.enabled; }).length * 6, 18);
+    if (settings.payments.pix.enabled && settings.payments.pix.webhookConfigured) {
+      score += 4;
+    }
+    if (settings.payments.card.enabled && settings.payments.card.connected) {
+      score += 3;
+    }
+
+    return Math.max(12, Math.min(99, score));
+  }
+
+  function isCompactViewport() {
+    return window.matchMedia("(max-width: 767px)").matches;
+  }
+
   function getToastStack() {
     var stack = document.querySelector(".izzimenu-demo-toast-stack");
     if (!stack) {
@@ -555,11 +736,14 @@
       writeJsonState(catalogStateKey, items);
     }
 
+    items = normalizeCatalogItems(items);
+    writeJsonState(catalogStateKey, items);
+
     return cloneData(items);
   }
 
   function saveDemoCatalog(items) {
-    writeJsonState(catalogStateKey, cloneData(items));
+    writeJsonState(catalogStateKey, normalizeCatalogItems(cloneData(items)));
   }
 
   function getDemoCustomers() {
@@ -574,6 +758,17 @@
 
   function saveDemoCustomers(items) {
     writeJsonState(customersStateKey, cloneData(items));
+  }
+
+  function getDemoSettings() {
+    var settings = readJsonState(settingsStateKey, null);
+    settings = normalizeSettingsState(settings || defaultDemoSettings);
+    writeJsonState(settingsStateKey, settings);
+    return cloneData(settings);
+  }
+
+  function saveDemoSettings(settings) {
+    writeJsonState(settingsStateKey, normalizeSettingsState(cloneData(settings)));
   }
 
   function getDemoCart() {
@@ -1376,6 +1571,9 @@
 
     var filtersBar = document.querySelector(".lg\\:col-span-3.bg-surface-container-low");
     var filterButtons = filtersBar ? Array.from(filtersBar.querySelectorAll("button")) : [];
+    if (filtersBar) {
+      filtersBar.classList.add("izzimenu-demo-chip-cloud");
+    }
     var selectedOrderId = null;
     var activeFilter = "todos";
     var activeQuery = "";
@@ -1601,10 +1799,13 @@
     }
 
     var tableBody = document.querySelector("tbody");
+    var customerTable = tableBody ? tableBody.closest("table") : null;
+    var tableShell = customerTable ? customerTable.parentElement : null;
     var sidebarColumn = document.querySelector(".xl\\:col-span-4.space-y-8");
     var filterGroup = Array.from(document.querySelectorAll("button")).filter(function (button) {
       return ["todos", "recorrentes", "novos"].indexOf(normalize(button.textContent)) !== -1;
     }).slice(0, 3);
+    var filterContainer = filterGroup[0] ? filterGroup[0].parentElement : null;
     var searchInput = Array.from(document.querySelectorAll("main input")).find(function (input) {
       return normalize(input.getAttribute("placeholder") || "").indexOf("buscar clientes") !== -1;
     });
@@ -1617,6 +1818,10 @@
 
     if (!tableBody || !sidebarColumn || !editorSection) {
       return;
+    }
+
+    if (filterContainer) {
+      filterContainer.classList.add("izzimenu-demo-chip-cloud");
     }
 
     function getFilteredCustomers() {
@@ -1655,20 +1860,68 @@
       return "bg-error-container text-on-error-container";
     }
 
+    function renderEmptyCustomerState() {
+      if (customerTable) {
+        customerTable.classList.remove("izzimenu-customers-table--cards");
+      }
+
+      tableBody.innerHTML =
+        "<tr><td colspan=\"5\" class=\"px-6 py-10 text-center\">" +
+        "<strong class=\"block text-on-surface font-headline text-lg\">Nenhum cliente encontrado</strong>" +
+        "<span class=\"mt-2 block text-sm text-on-surface-variant\">Ajuste a busca ou troque o filtro para continuar a demo.</span>" +
+        "</td></tr>";
+    }
+
+    function renderCustomerCard(customer, isSelected) {
+      return (
+        "<tr class=\"izzimenu-customer-card-row\" data-customer-id=\"" + customer.id + "\">" +
+        "<td colspan=\"5\" class=\"p-0\">" +
+        "<button type=\"button\" class=\"izzimenu-customer-card" + (isSelected ? " is-selected" : "") + "\" data-customer-id=\"" + customer.id + "\">" +
+        "<div class=\"izzimenu-customer-card__top\">" +
+        "<div class=\"izzimenu-customer-card__identity\">" +
+        "<div class=\"izzimenu-customer-card__avatar\">" + customer.initials + "</div>" +
+        "<div>" +
+        "<strong>" + customer.name + "</strong>" +
+        "<span>" + customer.phone + "</span>" +
+        "</div>" +
+        "</div>" +
+        "<span class=\"izzimenu-customer-card__badge " + getCustomerBadgeClass(customer) + "\">" + customer.badgeLabel + "</span>" +
+        "</div>" +
+        "<div class=\"izzimenu-customer-card__metrics\">" +
+        "<div><span>Pedidos</span><strong>" + customer.ordersCount + "</strong></div>" +
+        "<div><span>Total gasto</span><strong>" + formatMoney(customer.totalSpent) + "</strong></div>" +
+        "<div><span>Ultimo pedido</span><strong>" + customer.lastOrderLabel + "</strong></div>" +
+        "</div>" +
+        "<p class=\"izzimenu-customer-card__summary\">" + customer.summary + "</p>" +
+        "</button>" +
+        "</td>" +
+        "</tr>"
+      );
+    }
+
     function renderCustomerTable() {
       var customers = getFilteredCustomers();
+      var useCards = isCompactViewport();
 
       if (!customers.length) {
-        tableBody.innerHTML =
-          "<tr><td colspan=\"5\" class=\"px-6 py-10 text-center\">" +
-          "<strong class=\"block text-on-surface font-headline text-lg\">Nenhum cliente encontrado</strong>" +
-          "<span class=\"mt-2 block text-sm text-on-surface-variant\">Ajuste a busca ou troque o filtro para continuar a demo.</span>" +
-          "</td></tr>";
+        renderEmptyCustomerState();
         return;
+      }
+
+      if (customerTable) {
+        customerTable.classList.toggle("izzimenu-customers-table--cards", useCards);
+      }
+
+      if (tableShell) {
+        tableShell.classList.toggle("overflow-x-auto", !useCards);
       }
 
       tableBody.innerHTML = customers.map(function (customer, index) {
         var isSelected = customer.id === selectedCustomerId;
+        if (useCards) {
+          return renderCustomerCard(customer, isSelected);
+        }
+
         return (
           "<tr class=\"" + (index % 2 ? "bg-surface-container-low/20 " : "") + "hover:bg-surface-container-low/50 transition-colors cursor-pointer" + (isSelected ? " bg-primary-container/20" : "") + "\" data-customer-id=\"" + customer.id + "\">" +
           "<td class=\"px-6 py-5\">" +
@@ -1688,6 +1941,11 @@
 
     function renderCustomerSidebar(customer) {
       if (!customer) {
+        sidebarColumn.innerHTML =
+          "<div class=\"bg-surface-container-low rounded-xl p-6 border border-outline-variant/10 shadow-sm\">" +
+          "<strong class=\"block text-on-surface font-headline text-lg\">Nenhum cliente selecionado</strong>" +
+          "<span class=\"mt-2 block text-sm text-on-surface-variant\">Escolha um cliente para ver historico, campanhas e atalhos da demo.</span>" +
+          "</div>";
         return;
       }
 
@@ -1703,14 +1961,14 @@
         "<span class=\"inline-block px-3 py-1 mt-1 " + (customer.vip ? "bg-tertiary text-on-tertiary" : "bg-surface-container-high text-on-surface") + " text-[10px] font-bold rounded uppercase\">" + (customer.vip ? "Cliente VIP" : "Base ativa") + "</span>" +
         "</div>" +
         "<div class=\"space-y-4 text-sm\">" +
-        "<div class=\"flex justify-between gap-4 p-3 bg-white/50 rounded-lg\"><span class=\"text-on-surface-variant font-medium\">Endereço principal</span><span class=\"text-on-surface font-bold text-right\">" + customer.address + "</span></div>" +
-        "<div class=\"flex justify-between gap-4 p-3 bg-white/50 rounded-lg\"><span class=\"text-on-surface-variant font-medium\">Segmento</span><span class=\"text-on-surface font-bold\">" + customer.summary + "</span></div>" +
-        "<div class=\"flex justify-between gap-4 p-3 bg-white/50 rounded-lg\"><span class=\"text-on-surface-variant font-medium\">Contato</span><span class=\"text-on-surface font-bold text-right\">" + customer.email + "</span></div>" +
+        "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">Endereço principal</span><span class=\"text-on-surface font-bold sm:text-right\">" + customer.address + "</span></div>" +
+        "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">Segmento</span><span class=\"text-on-surface font-bold\">" + customer.summary + "</span></div>" +
+        "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">Contato</span><span class=\"text-on-surface font-bold break-all sm:text-right\">" + customer.email + "</span></div>" +
         "<div class=\"pt-4\">" +
-        "<p class=\"text-xs font-bold uppercase text-on-surface-variant mb-3\">Histórico de pedidos</p>" +
+        "<p class=\"text-xs font-bold uppercase text-on-surface-variant mb-3\">Historico de pedidos</p>" +
         "<div class=\"space-y-2\">" +
         customer.history.map(function (entry) {
-          return "<div class=\"flex items-center gap-3 text-xs p-2 hover:bg-white rounded transition-colors\"><span class=\"material-symbols-outlined text-primary\">package_2</span><div class=\"flex-1\"><p class=\"font-bold\">Pedido #" + entry.id + "</p><p class=\"text-on-surface-variant\">" + entry.status + " • " + entry.date + "</p></div><span class=\"font-bold\">" + formatMoney(entry.total) + "</span></div>";
+          return "<div class=\"flex items-center gap-3 text-xs p-2 hover:bg-white rounded transition-colors\"><span class=\"material-symbols-outlined text-primary\">package_2</span><div class=\"flex-1 min-w-0\"><p class=\"font-bold\">Pedido #" + entry.id + "</p><p class=\"text-on-surface-variant\">" + entry.status + " • " + entry.date + "</p></div><span class=\"font-bold whitespace-nowrap\">" + formatMoney(entry.total) + "</span></div>";
         }).join("") +
         "</div>" +
         "</div>" +
@@ -1775,6 +2033,16 @@
           selectCustomer(visibleCustomers[0] ? visibleCustomers[0].id : null);
         }
       });
+    }
+
+    if (!document.body.dataset.customersViewportBound) {
+      window.addEventListener("resize", function () {
+        renderCustomerTable();
+        renderCustomerSidebar(getDemoCustomers().find(function (item) {
+          return item.id === selectedCustomerId;
+        }) || null);
+      });
+      document.body.dataset.customersViewportBound = "true";
     }
 
     sidebarColumn.addEventListener("click", function (event) {
@@ -1863,7 +2131,8 @@
     if (initialCustomers.length) {
       selectCustomer(initialCustomers[0].id);
     } else {
-      renderCustomerTable();
+      renderEmptyCustomerState();
+      renderCustomerSidebar(null);
     }
   }
 
@@ -1877,12 +2146,15 @@
     });
     var productPanel = document.querySelector(".md\\:col-span-3.space-y-4");
     var editorSection = document.querySelector(".mt-20.bg-surface-container-lowest");
+    var extrasSection = editorSection ? Array.from(editorSection.querySelectorAll("div.space-y-4")).find(function (section) {
+      return normalize(section.textContent).indexOf("complementos e adicionais") !== -1;
+    }) : null;
     var selectedCategory = "Hambúrgueres";
     var selectedProductId = null;
     var draftProduct = null;
     var editorFocusTimeoutId = null;
 
-    if (!categoryCard || !productPanel || !editorSection) {
+    if (!categoryCard || !productPanel || !editorSection || !extrasSection) {
       return;
     }
 
@@ -1908,6 +2180,27 @@
       }) || null;
     }
 
+    function getDraftOptionGroup(groupId) {
+      if (!draftProduct || !Array.isArray(draftProduct.optionGroups)) {
+        return null;
+      }
+
+      return draftProduct.optionGroups.find(function (group) {
+        return group.id === groupId;
+      }) || null;
+    }
+
+    function getDraftOption(groupId, optionId) {
+      var group = getDraftOptionGroup(groupId);
+      if (!group || !Array.isArray(group.options)) {
+        return null;
+      }
+
+      return group.options.find(function (option) {
+        return option.id === optionId;
+      }) || null;
+    }
+
     function renderCategories() {
       var catalog = getDemoCatalog();
       var categories = getCategories(catalog);
@@ -1928,25 +2221,62 @@
       }).join("");
     }
 
+    function renderCatalogProductCard(product) {
+      return (
+        "<div class=\"izzimenu-catalog-mobile-card" + (product.id === selectedProductId ? " is-selected" : "") + "\" data-catalog-product=\"" + product.id + "\">" +
+        "<div class=\"izzimenu-catalog-mobile-card__top\">" +
+        "<img src=\"" + escapeHtml(product.image) + "\" alt=\"" + escapeHtml(product.name) + "\" />" +
+        "<div class=\"izzimenu-catalog-mobile-card__body\">" +
+        "<div class=\"izzimenu-catalog-mobile-card__heading\">" +
+        "<h4>" + escapeHtml(product.name) + "</h4>" +
+        (product.featured ? "<span class=\"izzimenu-catalog-mobile-card__badge\">Destaque</span>" : "") +
+        "</div>" +
+        "<p>" + escapeHtml(product.description) + "</p>" +
+        "</div>" +
+        "</div>" +
+        "<div class=\"izzimenu-catalog-mobile-card__footer\">" +
+        "<div>" +
+        "<strong>" + formatMoney(product.price) + "</strong>" +
+        "<span>" + (product.active ? "Disponivel para venda" : "Indisponivel") + "</span>" +
+        "</div>" +
+        "<label class=\"izzimenu-catalog-mobile-card__switch\">" +
+        "<input type=\"checkbox\" " + (product.active ? "checked" : "") + " data-catalog-toggle=\"" + product.id + "\" />" +
+        "<span>" + (product.active ? "Ativo" : "Inativo") + "</span>" +
+        "</label>" +
+        "</div>" +
+        "<div class=\"izzimenu-catalog-mobile-card__actions\">" +
+        "<button type=\"button\" data-catalog-action=\"edit\" data-product-id=\"" + product.id + "\"><span class=\"material-symbols-outlined\">edit</span><span>Editar</span></button>" +
+        "<button type=\"button\" data-catalog-action=\"duplicate\" data-product-id=\"" + product.id + "\"><span class=\"material-symbols-outlined\">content_copy</span><span>Duplicar</span></button>" +
+        "<button type=\"button\" data-catalog-action=\"delete\" data-product-id=\"" + product.id + "\"><span class=\"material-symbols-outlined\">delete</span><span>Excluir</span></button>" +
+        "</div>" +
+        "</div>"
+      );
+    }
+
     function renderProducts() {
       var catalog = getDemoCatalog();
       var products = catalog.filter(function (product) {
         return product.category === selectedCategory;
       });
+      var useCards = isCompactViewport();
 
       productPanel.innerHTML =
-        "<div class=\"flex items-center justify-between px-4 pb-2\">" +
-        "<div class=\"flex items-center gap-4\"><span class=\"text-sm font-bold text-on-surface\">" + selectedCategory + "</span><span class=\"text-xs text-on-surface-variant\">Fluxo totalmente navegável na demo</span></div>" +
+        "<div class=\"flex flex-col gap-2 px-1 pb-2 sm:px-4 sm:flex-row sm:items-center sm:justify-between\">" +
+        "<div class=\"flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4\"><span class=\"text-sm font-bold text-on-surface\">" + selectedCategory + "</span><span class=\"text-xs text-on-surface-variant\">" + (useCards ? "Toque para editar e veja a secao abaixo" : "Fluxo totalmente navegavel na demo") + "</span></div>" +
         "<div class=\"flex items-center gap-2 text-xs text-on-surface-variant font-medium\"><span>Exibindo " + products.length + " produto(s)</span></div>" +
         "</div>" +
         (products.length ? products.map(function (product) {
+          if (useCards) {
+            return renderCatalogProductCard(product);
+          }
+
           return (
             "<div class=\"group flex items-center " + (product.active ? "bg-surface-container-lowest shadow-[0_4px_12px_rgba(42,52,57,0.04)] hover:shadow-[0_12px_32px_-4px_rgba(42,52,57,0.08)]" : "bg-surface-container-low/50 border border-dashed border-outline-variant/30") + " p-4 rounded-xl transition-all" + (product.id === selectedProductId ? " ring-2 ring-primary/20" : "") + "\" data-catalog-product=\"" + product.id + "\">" +
             "<div class=\"drag-handle px-2 text-outline-variant\"><span class=\"material-symbols-outlined" + (product.active ? "" : " opacity-30") + "\">drag_indicator</span></div>" +
-            "<div class=\"relative\"><img class=\"w-16 h-16 rounded-lg object-cover ml-2" + (product.active ? "" : " grayscale opacity-50") + "\" src=\"" + product.image + "\" alt=\"" + product.name + "\" />" +
+            "<div class=\"relative\"><img class=\"w-16 h-16 rounded-lg object-cover ml-2" + (product.active ? "" : " grayscale opacity-50") + "\" src=\"" + escapeHtml(product.image) + "\" alt=\"" + escapeHtml(product.name) + "\" />" +
             (product.soldOut ? "<div class=\"absolute inset-0 flex items-center justify-center ml-2\"><span class=\"bg-surface text-[8px] font-black uppercase px-1 rounded\">Indisponível</span></div>" : "") +
             "</div>" +
-            "<div class=\"flex-1 px-6" + (product.active ? "" : " opacity-50") + "\"><div class=\"flex items-center gap-2 mb-1\"><h4 class=\"font-bold text-on-surface\">" + product.name + "</h4>" + (product.featured ? "<span class=\"material-symbols-outlined text-amber-500 text-[18px]\" style=\"font-variation-settings: 'FILL' 1;\">star</span>" : "") + "</div><p class=\"text-xs text-on-surface-variant line-clamp-1\">" + product.description + "</p></div>" +
+            "<div class=\"flex-1 px-6" + (product.active ? "" : " opacity-50") + "\"><div class=\"flex items-center gap-2 mb-1\"><h4 class=\"font-bold text-on-surface\">" + escapeHtml(product.name) + "</h4>" + (product.featured ? "<span class=\"material-symbols-outlined text-amber-500 text-[18px]\" style=\"font-variation-settings: 'FILL' 1;\">star</span>" : "") + "</div><p class=\"text-xs text-on-surface-variant line-clamp-1\">" + escapeHtml(product.description) + "</p></div>" +
             "<div class=\"px-6 text-right" + (product.active ? "" : " opacity-50") + "\"><span class=\"block text-sm font-bold text-on-surface\">" + formatMoney(product.price) + "</span><span class=\"text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter\">Preço Base</span></div>" +
             "<div class=\"px-6 border-l border-outline-variant/20 flex flex-col items-center gap-1\"><label class=\"relative inline-flex items-center cursor-pointer\"><input class=\"sr-only peer\" type=\"checkbox\" " + (product.active ? "checked" : "") + " data-catalog-toggle=\"" + product.id + "\" /><div class=\"w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary\"></div></label><span class=\"text-[10px] font-bold text-on-surface-variant uppercase\">" + (product.active ? "Ativo" : "Inativo") + "</span></div>" +
             "<div class=\"flex gap-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity\">" +
@@ -1956,7 +2286,46 @@
             "</div>" +
             "</div>"
           );
-        }).join("") : "<div class=\"bg-surface-container-lowest p-6 rounded-xl shadow-sm\"><div class=\"flex flex-col items-center justify-center py-12 text-center\"><span class=\"material-symbols-outlined text-4xl text-outline-variant mb-4\">inventory_2</span><h5 class=\"font-bold text-on-surface mb-1\">Nenhum produto nesta categoria</h5><p class=\"text-sm text-on-surface-variant mb-6\">Use o botão Novo Produto para criar o primeiro item dessa seção.</p><button type=\"button\" class=\"text-primary font-bold text-sm hover:underline\" data-catalog-action=\"new-product-empty\">Criar produto agora</button></div></div>");
+        }).join("") : "<div class=\"bg-surface-container-lowest p-6 rounded-xl shadow-sm\"><div class=\"flex flex-col items-center justify-center py-12 text-center\"><span class=\"material-symbols-outlined text-4xl text-outline-variant mb-4\">inventory_2</span><h5 class=\"font-bold text-on-surface mb-1\">Nenhum produto nesta categoria</h5><p class=\"text-sm text-on-surface-variant mb-6\">Use o botao Novo Produto para criar o primeiro item dessa secao.</p><button type=\"button\" class=\"text-primary font-bold text-sm hover:underline\" data-catalog-action=\"new-product-empty\">Criar produto agora</button></div></div>");
+    }
+
+    function renderOptionGroups() {
+      var groups = draftProduct && Array.isArray(draftProduct.optionGroups) ? draftProduct.optionGroups : [];
+
+      extrasSection.innerHTML =
+        "<div class=\"flex items-center justify-between gap-4 flex-wrap\">" +
+        "<h3 class=\"font-bold text-on-surface\">Complementos e Adicionais</h3>" +
+        "<button type=\"button\" class=\"text-primary text-xs font-bold flex items-center gap-1\" data-option-groups-action=\"add-group\"><span class=\"material-symbols-outlined text-sm\">add</span> Adicionar Grupo</button>" +
+        "</div>" +
+        (groups.length ? groups.map(function (group) {
+          return (
+            "<div class=\"bg-surface-container-low p-4 rounded-xl space-y-4\" data-option-group-id=\"" + group.id + "\">" +
+            "<div class=\"flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between\">" +
+            "<div class=\"grid grid-cols-1 md:grid-cols-3 gap-3 flex-1\">" +
+            "<label class=\"space-y-1\"><span class=\"text-[10px] font-black uppercase tracking-widest text-on-surface-variant\">Grupo</span><input class=\"w-full bg-surface-container-lowest border-none rounded-lg text-sm font-semibold\" type=\"text\" value=\"" + escapeHtml(group.name) + "\" data-group-field=\"name\" /></label>" +
+            "<label class=\"space-y-1\"><span class=\"text-[10px] font-black uppercase tracking-widest text-on-surface-variant\">Minimo</span><input class=\"w-full bg-surface-container-lowest border-none rounded-lg text-sm font-semibold\" type=\"number\" min=\"0\" value=\"" + group.min + "\" data-group-field=\"min\" /></label>" +
+            "<label class=\"space-y-1\"><span class=\"text-[10px] font-black uppercase tracking-widest text-on-surface-variant\">Maximo</span><input class=\"w-full bg-surface-container-lowest border-none rounded-lg text-sm font-semibold\" type=\"number\" min=\"" + group.min + "\" value=\"" + group.max + "\" data-group-field=\"max\" /></label>" +
+            "</div>" +
+            "<button type=\"button\" class=\"self-start lg:self-auto text-error text-xs font-bold flex items-center gap-1\" data-option-group-action=\"delete-group\" data-option-group-id=\"" + group.id + "\"><span class=\"material-symbols-outlined text-sm\">delete</span> Excluir Grupo</button>" +
+            "</div>" +
+            "<div class=\"space-y-3\">" +
+            group.options.map(function (option) {
+              return (
+                "<div class=\"izzimenu-option-row\" data-option-id=\"" + option.id + "\">" +
+                "<input class=\"w-full bg-surface-container-lowest border-none rounded-lg text-sm font-medium\" type=\"text\" value=\"" + escapeHtml(option.name) + "\" data-option-field=\"name\" data-option-group-id=\"" + group.id + "\" data-option-id=\"" + option.id + "\" />" +
+                "<div class=\"relative\"><span class=\"absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black text-primary\">R$</span><input class=\"w-full bg-surface-container-lowest border-none rounded-lg text-sm font-semibold pl-10\" type=\"text\" value=\"" + Number(option.price || 0).toFixed(2).replace(".", ",") + "\" data-option-field=\"price\" data-option-group-id=\"" + group.id + "\" data-option-id=\"" + option.id + "\" /></div>" +
+                "<button type=\"button\" class=\"text-error flex items-center justify-center rounded-lg bg-surface-container-lowest\" data-option-action=\"delete-option\" data-option-group-id=\"" + group.id + "\" data-option-id=\"" + option.id + "\"><span class=\"material-symbols-outlined\">close</span></button>" +
+                "</div>"
+              );
+            }).join("") +
+            "</div>" +
+            "<div class=\"flex items-center justify-between gap-3 flex-wrap pt-1\">" +
+            "<span class=\"text-[10px] font-bold uppercase tracking-widest text-on-surface-variant\">Obrigatorio de " + group.min + " ate " + group.max + " selecao(oes)</span>" +
+            "<button type=\"button\" class=\"text-primary text-xs font-bold flex items-center gap-1\" data-option-group-action=\"add-option\" data-option-group-id=\"" + group.id + "\"><span class=\"material-symbols-outlined text-sm\">add_circle</span> Adicionar Opcao</button>" +
+            "</div>" +
+            "</div>"
+          );
+        }).join("") : "<div class=\"bg-surface-container-low p-5 rounded-xl text-sm text-on-surface-variant\">Nenhum grupo criado ainda. Use <strong class=\"text-on-surface\">Adicionar Grupo</strong> para montar adicionais editaveis nesta demo.</div>");
     }
 
     function syncEditorFields() {
@@ -2008,6 +2377,8 @@
         imagePreview.src = draftProduct.image;
         imagePreview.alt = draftProduct.name;
       }
+
+      renderOptionGroups();
     }
 
     function bringEditorIntoView() {
@@ -2060,14 +2431,15 @@
       var newProduct = {
         id: slugify("novo-produto-" + Date.now()),
         name: "Novo Produto Demo",
-        description: "Item criado para simular o fluxo completo do cardápio.",
+        description: "Item criado para simular o fluxo completo do cardapio.",
         details: "Personalize este produto na demo e salve para apresentar o comportamento final ao cliente.",
         price: 29.9,
         category: safeCategory,
         featured: false,
         active: true,
         soldOut: false,
-        image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80"
+        image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80",
+        optionGroups: []
       };
       var catalog = getDemoCatalog();
       catalog.unshift(newProduct);
@@ -2079,6 +2451,19 @@
       syncEditorFields();
       bringEditorIntoView();
       showDemoToast("Produto criado", "O novo item foi adicionado apenas nesta demo para navegação comercial.", "success");
+    }
+
+    function addOptionGroup() {
+      if (!draftProduct) {
+        return;
+      }
+
+      draftProduct.optionGroups = Array.isArray(draftProduct.optionGroups) ? draftProduct.optionGroups : [];
+      draftProduct.optionGroups.push(createDemoOptionGroup("Novo grupo", 0, 2, [
+        { name: "Opcao 1", price: 0 }
+      ], slugify("grupo-" + Date.now())));
+      renderOptionGroups();
+      showDemoToast("Grupo criado", "Agora voce pode editar nome, limites e opcoes antes de salvar.", "success");
     }
 
     categoryCard.addEventListener("click", function (event) {
@@ -2142,6 +2527,10 @@
         }
       }
 
+      if (event.target.closest("[data-catalog-toggle]")) {
+        return;
+      }
+
       var row = event.target.closest("[data-catalog-product]");
       if (row) {
         selectedProductId = row.getAttribute("data-catalog-product");
@@ -2177,6 +2566,112 @@
       renderProducts();
       showDemoToast("Disponibilidade atualizada", "O status do item foi alterado na demo.", "success");
     });
+
+    extrasSection.addEventListener("click", function (event) {
+      var addGroupTrigger = event.target.closest("[data-option-groups-action='add-group']");
+      if (addGroupTrigger) {
+        addOptionGroup();
+        return;
+      }
+
+      var groupAction = event.target.closest("[data-option-group-action]");
+      if (groupAction) {
+        var groupId = groupAction.getAttribute("data-option-group-id");
+
+        if (groupAction.getAttribute("data-option-group-action") === "delete-group" && draftProduct) {
+          draftProduct.optionGroups = (draftProduct.optionGroups || []).filter(function (group) {
+            return group.id !== groupId;
+          });
+          renderOptionGroups();
+          showDemoToast("Grupo removido", "O grupo saiu do rascunho atual. Salve para aplicar no cardapio.", "warning");
+          return;
+        }
+
+        if (groupAction.getAttribute("data-option-group-action") === "add-option") {
+          var group = getDraftOptionGroup(groupId);
+          if (!group) {
+            return;
+          }
+
+          group.options.push(createDemoOption("Nova opcao", 0, slugify("opcao-" + Date.now())));
+          group.max = Math.max(group.max, group.options.length);
+          renderOptionGroups();
+          showDemoToast("Opcao adicionada", "Preencha o nome e o preco antes de salvar.", "success");
+        }
+        return;
+      }
+
+      var optionAction = event.target.closest("[data-option-action='delete-option']");
+      if (!optionAction) {
+        return;
+      }
+
+      var optionGroup = getDraftOptionGroup(optionAction.getAttribute("data-option-group-id"));
+      if (!optionGroup) {
+        return;
+      }
+
+      optionGroup.options = optionGroup.options.filter(function (option) {
+        return option.id !== optionAction.getAttribute("data-option-id");
+      });
+      optionGroup.max = Math.min(Math.max(optionGroup.min, optionGroup.max), Math.max(optionGroup.min, optionGroup.options.length || optionGroup.min || 1));
+      renderOptionGroups();
+      showDemoToast("Opcao removida", "A remocao ficou no rascunho atual do produto.", "warning");
+    });
+
+    extrasSection.addEventListener("input", function (event) {
+      var groupField = event.target.dataset.groupField;
+      var optionField = event.target.dataset.optionField;
+
+      if (groupField) {
+        var hostGroup = getDraftOptionGroup(event.target.closest("[data-option-group-id]").getAttribute("data-option-group-id"));
+        if (!hostGroup) {
+          return;
+        }
+
+        if (groupField === "name") {
+          hostGroup.name = event.target.value.trim() || "Novo grupo";
+          return;
+        }
+
+        if (groupField === "min" || groupField === "max") {
+          var numericValue = Math.max(0, Number(event.target.value || 0));
+          hostGroup[groupField] = numericValue;
+          if (groupField === "min" && hostGroup.max < numericValue) {
+            hostGroup.max = numericValue;
+          }
+        }
+        return;
+      }
+
+      if (optionField) {
+        var option = getDraftOption(event.target.dataset.optionGroupId, event.target.dataset.optionId);
+        if (!option) {
+          return;
+        }
+
+        if (optionField === "name") {
+          option.name = event.target.value.trim() || "Nova opcao";
+        }
+
+        if (optionField === "price") {
+          option.price = parseMoney(event.target.value);
+        }
+      }
+    });
+
+    extrasSection.addEventListener("blur", function (event) {
+      if (event.target.dataset.optionField === "price") {
+        var option = getDraftOption(event.target.dataset.optionGroupId, event.target.dataset.optionId);
+        if (option) {
+          event.target.value = Number(option.price || 0).toFixed(2).replace(".", ",");
+        }
+      }
+
+      if (event.target.dataset.groupField === "min" || event.target.dataset.groupField === "max") {
+        renderOptionGroups();
+      }
+    }, true);
 
     var topButtons = Array.from(document.querySelectorAll("button"));
     var newCategoryButton = topButtons.find(function (button) {
@@ -2246,13 +2741,13 @@
 
     if (addGroupButton) {
       addGroupButton.addEventListener("click", function () {
-        showDemoToast("Grupo adicional", "Na demo, o cadastro de extras está sinalizado, mas sem um builder completo de opções.", "warning");
+        addOptionGroup();
       });
     }
 
     if (duplicateEditorButton) {
       duplicateEditorButton.addEventListener("click", function () {
-        var product = getSelectedProduct(getDemoCatalog());
+        var product = draftProduct || getSelectedProduct(getDemoCatalog());
         if (!product) {
           return;
         }
@@ -2267,6 +2762,7 @@
         renderProducts();
         syncEditorFields();
         bringEditorIntoView();
+        showDemoToast("Produto duplicado", "A copia herdou inclusive os grupos de adicionais da demo.", "success");
       });
     }
 
@@ -2290,7 +2786,15 @@
         renderCategories();
         renderProducts();
         syncEditorFields();
+        showDemoToast("Produto removido", "O item foi removido desta instancia da demo.", "warning");
       });
+    }
+
+    if (!document.body.dataset.catalogViewportBound) {
+      window.addEventListener("resize", function () {
+        renderProducts();
+      });
+      document.body.dataset.catalogViewportBound = "true";
     }
 
     var initialCatalog = getDemoCatalog();
@@ -2678,15 +3182,404 @@
       return;
     }
 
-    Array.from(document.querySelectorAll("button")).forEach(function (button) {
-      var label = normalize(button.textContent);
-      if (label.indexOf("salvar alteracoes") !== -1 && !button.dataset.demoBound) {
-        button.addEventListener("click", function () {
-          showDemoToast("Configurações em modo demo", "Os dados de perfil e loja não são persistidos nesta demonstração comercial.", "warning");
-        });
-        button.dataset.demoBound = "true";
-      }
+    var main = document.querySelector("main");
+    var sections = Array.from(document.querySelectorAll("main section"));
+    var storeSection = sections.find(function (section) {
+      return normalize(section.textContent).indexOf("dados da loja") !== -1 && normalize(section.textContent).indexOf("nome da unidade") !== -1;
     });
+    var hoursSection = sections.find(function (section) {
+      return normalize(section.textContent).indexOf("horarios de funcionamento") !== -1;
+    });
+    var deliverySection = sections.find(function (section) {
+      return normalize(section.textContent).indexOf("regras de entrega") !== -1;
+    });
+    var paymentsCard = Array.from(document.querySelectorAll("main .bg-surface-container-low")).find(function (card) {
+      return normalize(card.textContent).indexOf("pagamentos") !== -1 && normalize(card.textContent).indexOf("pix") !== -1;
+    });
+    var actionsCard = Array.from(document.querySelectorAll("main .sticky, main .bg-surface-container-lowest")).find(function (card) {
+      return normalize(card.textContent).indexOf("salvar alteracoes") !== -1 && normalize(card.textContent).indexOf("zona de perigo") !== -1;
+    });
+    var statusCard = Array.from(document.querySelectorAll("main .bg-primary")).find(function (card) {
+      return normalize(card.textContent).indexOf("visibilidade online") !== -1;
+    });
+    var tabButtons = Array.from(document.querySelectorAll("button")).filter(function (button) {
+      return ["dados da loja", "horarios", "entrega", "pagamentos"].indexOf(normalize(button.textContent)) !== -1;
+    }).slice(0, 4);
+    var tabsContainer = tabButtons[0] ? tabButtons[0].parentElement : null;
+    var savedSettings = getDemoSettings();
+    var draftSettings = cloneData(savedSettings);
+    var activeTab = "dados da loja";
+
+    if (!main || !storeSection || !hoursSection || !deliverySection || !paymentsCard || !actionsCard || !statusCard) {
+      return;
+    }
+
+    if (tabsContainer) {
+      tabsContainer.classList.add("izzimenu-demo-chip-cloud");
+    }
+
+    function getSectionByTab(tabLabel) {
+      var key = normalize(tabLabel);
+      if (key === "dados da loja") {
+        return storeSection;
+      }
+      if (key === "horarios") {
+        return hoursSection;
+      }
+      if (key === "entrega") {
+        return deliverySection;
+      }
+      return paymentsCard;
+    }
+
+    function updateTabState() {
+      tabButtons.forEach(function (button) {
+        var isActive = normalize(button.textContent) === activeTab;
+        button.className = isActive
+          ? "px-5 py-2.5 rounded-full text-sm font-bold bg-surface-container-lowest text-primary shadow-sm whitespace-nowrap"
+          : "px-5 py-2.5 rounded-full text-sm font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors whitespace-nowrap";
+      });
+    }
+
+    function formatSettingsMoney(value) {
+      return Number(value || 0).toFixed(2).replace(".", ",");
+    }
+
+    function findActionButton(fragment) {
+      return Array.from(actionsCard.querySelectorAll("button")).find(function (button) {
+        return normalize(button.textContent).indexOf(fragment) !== -1;
+      }) || null;
+    }
+
+    function renderStoreFields() {
+      var storeInputs = storeSection.querySelectorAll("input");
+      if (storeInputs[0]) {
+        storeInputs[0].value = draftSettings.storeName;
+      }
+      if (storeInputs[1]) {
+        storeInputs[1].value = draftSettings.cnpj;
+      }
+      if (storeInputs[2]) {
+        storeInputs[2].value = draftSettings.address;
+      }
+      if (storeInputs[3]) {
+        storeInputs[3].value = draftSettings.phone;
+      }
+      if (storeInputs[4]) {
+        storeInputs[4].value = draftSettings.supportEmail;
+      }
+    }
+
+    function renderHoursSection() {
+      Array.from(hoursSection.querySelectorAll(".group")).forEach(function (row, index) {
+        var schedule = draftSettings.hours[index];
+        if (!schedule) {
+          return;
+        }
+
+        var times = row.querySelectorAll("input[type='time']");
+        var statusLabel = Array.from(row.querySelectorAll("span")).find(function (element) {
+          return /uppercase/.test(element.className) && /font-black/.test(element.className);
+        });
+        var toggle = Array.from(row.querySelectorAll("div")).find(function (element) {
+          return /w-10/.test(element.className) && /h-5/.test(element.className) && /rounded-full/.test(element.className);
+        });
+        var dayLabel = row.querySelector(".font-bold.text-sm");
+
+        if (dayLabel) {
+          dayLabel.textContent = schedule.label;
+        }
+        if (times[0]) {
+          times[0].value = schedule.opensAt;
+          times[0].disabled = !schedule.enabled;
+        }
+        if (times[1]) {
+          times[1].value = schedule.closesAt;
+          times[1].disabled = !schedule.enabled;
+        }
+        if (statusLabel) {
+          statusLabel.textContent = schedule.enabled ? "Aberto" : "Fechado";
+          statusLabel.className = "text-[10px] font-black uppercase " + (schedule.enabled ? "text-primary" : "text-on-surface-variant");
+        }
+        row.className = "flex flex-wrap items-center justify-between p-4 rounded-lg group " + (schedule.enabled ? "bg-surface-container-lowest" : "bg-surface-container-high/50 opacity-60");
+
+        if (toggle) {
+          toggle.dataset.scheduleIndex = String(index);
+          toggle.setAttribute("role", "button");
+          toggle.setAttribute("tabindex", "0");
+          toggle.className = "w-10 h-5 rounded-full relative cursor-pointer transition-colors " + (schedule.enabled ? "bg-primary/20" : "bg-outline-variant/20");
+          toggle.innerHTML = "<div class=\"absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all " + (schedule.enabled ? "right-0.5 bg-primary" : "left-0.5 bg-outline-variant") + "\"></div>";
+        }
+      });
+    }
+
+    function renderDeliverySection() {
+      var deliveryInputs = deliverySection.querySelectorAll("input[type='text']");
+      if (deliveryInputs[0]) {
+        deliveryInputs[0].value = formatSettingsMoney(draftSettings.delivery.baseFee);
+      }
+      if (deliveryInputs[1]) {
+        deliveryInputs[1].value = formatSettingsMoney(draftSettings.delivery.feePerKm);
+      }
+      if (deliveryInputs[2]) {
+        deliveryInputs[2].value = String(Number(draftSettings.delivery.maxRadius || 0));
+      }
+      if (deliveryInputs[3]) {
+        deliveryInputs[3].value = formatSettingsMoney(draftSettings.delivery.minimumOrder);
+      }
+    }
+
+    function renderPaymentsSection() {
+      var paymentCards = paymentsCard.querySelectorAll(".bg-surface-container-lowest");
+      var pixCard = paymentCards[0];
+      var gatewayCard = paymentCards[1];
+
+      if (pixCard) {
+        var pixBadge = pixCard.querySelector(".inline-flex");
+        var pixInput = pixCard.querySelector("input");
+        var webhookButton = Array.from(pixCard.querySelectorAll("button")).find(function (button) {
+          return normalize(button.textContent).indexOf("webhook") !== -1;
+        });
+
+        if (pixBadge) {
+          pixBadge.textContent = draftSettings.payments.pix.enabled ? "Ativo" : "Pausado";
+          pixBadge.className = "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase " + (draftSettings.payments.pix.enabled ? "bg-secondary-container text-on-secondary-container" : "bg-surface-container-high text-on-surface-variant");
+        }
+        if (pixInput) {
+          pixInput.readOnly = false;
+          pixInput.value = draftSettings.payments.pix.key;
+          pixInput.classList.remove("text-outline");
+          pixInput.classList.add("text-on-surface");
+        }
+        if (webhookButton) {
+          webhookButton.innerHTML = "<span class=\"material-symbols-outlined text-sm\">settings</span> " + draftSettings.payments.pix.webhookLabel;
+        }
+      }
+
+      if (gatewayCard) {
+        var gatewayText = gatewayCard.querySelector("p");
+        var manageButton = Array.from(gatewayCard.querySelectorAll("button")).find(function (button) {
+          return normalize(button.textContent).indexOf("gerenciar conexao") !== -1;
+        });
+        if (gatewayText) {
+          gatewayText.innerHTML = "Integrado com <strong>" + draftSettings.payments.card.provider + "</strong>";
+        }
+        if (manageButton) {
+          manageButton.textContent = draftSettings.payments.card.connected ? "Gateway Conectado" : "Reconectar Gateway";
+        }
+      }
+    }
+
+    function renderStatusCard() {
+      var visibility = calculateStoreVisibility(draftSettings);
+      var valueHeading = statusCard.querySelector("h4");
+      var statusText = statusCard.querySelector("p");
+      var trendIcon = statusCard.querySelector(".material-symbols-outlined");
+
+      if (valueHeading) {
+        valueHeading.textContent = visibility.toFixed(1) + "%";
+      }
+      if (statusText) {
+        statusText.textContent = draftSettings.unitActive
+          ? "Loja operacional. Ajustes desta demo ficam salvos neste navegador."
+          : "Loja pausada na demo. Reative a unidade para voltar a exibir pagamentos e horarios.";
+      }
+      if (trendIcon) {
+        trendIcon.textContent = draftSettings.unitActive ? "trending_up" : "pause_circle";
+        trendIcon.className = "material-symbols-outlined " + (draftSettings.unitActive ? "text-green-300" : "text-amber-200");
+      }
+    }
+
+    function renderActionsCard() {
+      var saveButton = findActionButton("salvar alteracoes");
+      var discardButton = findActionButton("descartar");
+      var dangerButton = findActionButton("desativar unidade") || findActionButton("reativar unidade");
+
+      if (saveButton) {
+        saveButton.innerHTML = "<span class=\"material-symbols-outlined text-xl\">save</span> Salvar Alteracoes";
+      }
+      if (discardButton) {
+        discardButton.textContent = "Descartar";
+      }
+      if (dangerButton) {
+        dangerButton.textContent = draftSettings.unitActive ? "Desativar Unidade" : "Reativar Unidade";
+      }
+    }
+
+    function renderAll() {
+      renderStoreFields();
+      renderHoursSection();
+      renderDeliverySection();
+      renderPaymentsSection();
+      renderStatusCard();
+      renderActionsCard();
+      updateTabState();
+    }
+
+    function saveDraftSettings() {
+      savedSettings = normalizeSettingsState(draftSettings);
+      saveDemoSettings(savedSettings);
+      draftSettings = cloneData(savedSettings);
+      renderAll();
+      showDemoToast("Configuracoes salvas", "Os dados desta demo ficaram persistidos neste navegador. Troca de identidade visual continua bloqueada por ser demonstracao.", "success");
+    }
+
+    function discardDraftSettings() {
+      draftSettings = cloneData(savedSettings);
+      renderAll();
+      showDemoToast("Rascunho descartado", "Os campos voltaram para a ultima versao salva nesta demo.", "warning");
+    }
+
+    function scrollToSection(targetSection) {
+      if (!targetSection) {
+        return;
+      }
+
+      var bannerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--izzimenu-demo-banner-height")) || 0;
+      var topBarHeight = document.querySelector(".izzimenu-admin-topbar") ? document.querySelector(".izzimenu-admin-topbar").offsetHeight : 0;
+      var targetTop = targetSection.getBoundingClientRect().top + window.scrollY - bannerHeight - topBarHeight - 18;
+
+      window.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: "smooth"
+      });
+    }
+
+    tabButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        activeTab = normalize(button.textContent);
+        updateTabState();
+        scrollToSection(getSectionByTab(button.textContent));
+      });
+    });
+
+    var storeInputs = storeSection.querySelectorAll("input");
+    if (storeInputs[0]) {
+      storeInputs[0].addEventListener("input", function () { draftSettings.storeName = this.value.trim(); });
+    }
+    if (storeInputs[1]) {
+      storeInputs[1].addEventListener("input", function () { draftSettings.cnpj = this.value.trim(); });
+    }
+    if (storeInputs[2]) {
+      storeInputs[2].addEventListener("input", function () { draftSettings.address = this.value.trim(); });
+    }
+    if (storeInputs[3]) {
+      storeInputs[3].addEventListener("input", function () { draftSettings.phone = this.value.trim(); });
+    }
+    if (storeInputs[4]) {
+      storeInputs[4].addEventListener("input", function () { draftSettings.supportEmail = this.value.trim(); });
+    }
+
+    var brandingTrigger = storeSection.querySelector(".cursor-pointer");
+    if (brandingTrigger && !brandingTrigger.dataset.bound) {
+      brandingTrigger.addEventListener("click", function () {
+        showDemoToast("Troca visual bloqueada", "Logo e foto da unidade ficam travados na demo. No clone final, esse upload pode ser liberado.", "warning");
+      });
+      brandingTrigger.dataset.bound = "true";
+    }
+
+    Array.from(hoursSection.querySelectorAll("input[type='time']")).forEach(function (input) {
+      input.addEventListener("change", function () {
+        var row = this.closest(".group");
+        var rowIndex = Array.from(hoursSection.querySelectorAll(".group")).indexOf(row);
+        var times = row.querySelectorAll("input[type='time']");
+        if (draftSettings.hours[rowIndex]) {
+          draftSettings.hours[rowIndex].opensAt = times[0] ? times[0].value : draftSettings.hours[rowIndex].opensAt;
+          draftSettings.hours[rowIndex].closesAt = times[1] ? times[1].value : draftSettings.hours[rowIndex].closesAt;
+        }
+      });
+    });
+
+    hoursSection.addEventListener("click", function (event) {
+      var toggle = event.target.closest("[data-schedule-index]");
+      if (!toggle) {
+        return;
+      }
+
+      var schedule = draftSettings.hours[Number(toggle.getAttribute("data-schedule-index"))];
+      if (!schedule) {
+        return;
+      }
+
+      schedule.enabled = !schedule.enabled;
+      renderHoursSection();
+      renderStatusCard();
+    });
+
+    var deliveryInputs = deliverySection.querySelectorAll("input[type='text']");
+    if (deliveryInputs[0]) {
+      deliveryInputs[0].addEventListener("input", function () { draftSettings.delivery.baseFee = parseMoney(this.value); });
+      deliveryInputs[0].addEventListener("blur", function () { this.value = formatSettingsMoney(draftSettings.delivery.baseFee); });
+    }
+    if (deliveryInputs[1]) {
+      deliveryInputs[1].addEventListener("input", function () { draftSettings.delivery.feePerKm = parseMoney(this.value); });
+      deliveryInputs[1].addEventListener("blur", function () { this.value = formatSettingsMoney(draftSettings.delivery.feePerKm); });
+    }
+    if (deliveryInputs[2]) {
+      deliveryInputs[2].addEventListener("input", function () { draftSettings.delivery.maxRadius = Number(this.value || 0); });
+      deliveryInputs[2].addEventListener("blur", function () { this.value = String(Number(draftSettings.delivery.maxRadius || 0)); });
+    }
+    if (deliveryInputs[3]) {
+      deliveryInputs[3].addEventListener("input", function () { draftSettings.delivery.minimumOrder = parseMoney(this.value); });
+      deliveryInputs[3].addEventListener("blur", function () { this.value = formatSettingsMoney(draftSettings.delivery.minimumOrder); });
+    }
+
+    var pixInput = paymentsCard.querySelector("input");
+    if (pixInput) {
+      pixInput.addEventListener("input", function () {
+        draftSettings.payments.pix.key = this.value.trim();
+      });
+    }
+
+    var webhookButton = Array.from(paymentsCard.querySelectorAll("button")).find(function (button) {
+      return normalize(button.textContent).indexOf("webhook") !== -1;
+    });
+    if (webhookButton) {
+      webhookButton.addEventListener("click", function () {
+        draftSettings.payments.pix.webhookConfigured = !draftSettings.payments.pix.webhookConfigured;
+        draftSettings.payments.pix.webhookLabel = draftSettings.payments.pix.webhookConfigured ? "Webhook conectado" : "Reconectar webhook";
+        renderPaymentsSection();
+        renderStatusCard();
+        showDemoToast("Webhook atualizado", draftSettings.payments.pix.webhookConfigured ? "A chave PIX ficou pronta para automacao nesta demo." : "O webhook foi pausado na demo para simular manutencao.", draftSettings.payments.pix.webhookConfigured ? "success" : "warning");
+      });
+    }
+
+    var manageGatewayButton = Array.from(paymentsCard.querySelectorAll("button")).find(function (button) {
+      return normalize(button.textContent).indexOf("gerenciar conexao") !== -1 || normalize(button.textContent).indexOf("gateway conectado") !== -1 || normalize(button.textContent).indexOf("reconectar gateway") !== -1;
+    });
+    if (manageGatewayButton) {
+      manageGatewayButton.addEventListener("click", function () {
+        draftSettings.payments.card.connected = !draftSettings.payments.card.connected;
+        draftSettings.payments.card.enabled = draftSettings.payments.card.connected;
+        renderPaymentsSection();
+        renderStatusCard();
+        showDemoToast("Gateway atualizado", draftSettings.payments.card.connected ? "Mercado Pago voltou a responder na demo." : "Gateway pausado na demo para simular indisponibilidade.", draftSettings.payments.card.connected ? "success" : "warning");
+      });
+    }
+
+    var saveButton = findActionButton("salvar alteracoes");
+    var discardButton = findActionButton("descartar");
+    var dangerButton = findActionButton("desativar unidade");
+
+    if (saveButton && !saveButton.dataset.demoBound) {
+      saveButton.addEventListener("click", saveDraftSettings);
+      saveButton.dataset.demoBound = "true";
+    }
+    if (discardButton && !discardButton.dataset.demoBound) {
+      discardButton.addEventListener("click", discardDraftSettings);
+      discardButton.dataset.demoBound = "true";
+    }
+    if (dangerButton && !dangerButton.dataset.demoBound) {
+      dangerButton.addEventListener("click", function () {
+        draftSettings.unitActive = !draftSettings.unitActive;
+        renderStatusCard();
+        renderActionsCard();
+        showDemoToast(draftSettings.unitActive ? "Unidade reativada" : "Unidade pausada", draftSettings.unitActive ? "A loja voltou a ficar visivel na demo. Salve para manter essa configuracao." : "A unidade ficou pausada apenas no rascunho atual da demo.", draftSettings.unitActive ? "success" : "warning");
+      });
+      dangerButton.dataset.demoBound = "true";
+    }
+
+    renderAll();
   }
 
   function setupAdminSearch() {
