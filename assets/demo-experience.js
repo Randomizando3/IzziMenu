@@ -3315,12 +3315,12 @@
     function renderSummary(cartItems) {
       var totals = getCartTotals(cartItems, "");
       summaryRoot.innerHTML =
-        "<div class=\"space-y-3\">" +
-        "<div class=\"flex items-center justify-between text-sm text-on-surface-variant\"><span>Itens</span><strong class=\"text-on-surface\">" + cartItems.reduce(function (sum, item) { return sum + item.quantity; }, 0) + "</strong></div>" +
-        "<div class=\"flex items-center justify-between text-sm text-on-surface-variant\"><span>Subtotal</span><strong class=\"text-on-surface\">" + formatMoney(totals.subtotal) + "</strong></div>" +
-        "<div class=\"flex items-center justify-between text-sm text-on-surface-variant\"><span>Entrega estimada</span><strong class=\"text-on-surface\">" + formatDeliveryFee(totals.deliveryFee) + "</strong></div>" +
-        "<div class=\"pt-3 border-t border-outline-variant/10 flex items-center justify-between\"><span class=\"font-bold text-on-surface\">Total</span><strong class=\"text-xl font-black text-on-surface\">" + formatMoney(totals.total) + "</strong></div>" +
-        "<p class=\"text-xs text-on-surface-variant\">Pagamento continua em modo demo na próxima etapa, sem cobrança real.</p>" +
+        "<div class=\"space-y-3 text-white\">" +
+        "<div class=\"flex items-center justify-between text-sm text-white/80\"><span>Itens</span><strong class=\"text-white\">" + cartItems.reduce(function (sum, item) { return sum + item.quantity; }, 0) + "</strong></div>" +
+        "<div class=\"flex items-center justify-between text-sm text-white/80\"><span>Subtotal</span><strong class=\"text-white\">" + formatMoney(totals.subtotal) + "</strong></div>" +
+        "<div class=\"flex items-center justify-between text-sm text-white/80\"><span>Entrega estimada</span><strong class=\"text-white\">" + formatDeliveryFee(totals.deliveryFee) + "</strong></div>" +
+        "<div class=\"pt-3 border-t border-white/10 flex items-center justify-between\"><span class=\"font-bold text-white\">Total</span><strong class=\"text-xl font-black text-white\">" + formatMoney(totals.total) + "</strong></div>" +
+        "<p class=\"text-xs text-white/70\">Pagamento continua em modo demo na próxima etapa, sem cobrança real.</p>" +
         "</div>";
     }
 
@@ -3333,7 +3333,7 @@
           "<span class=\"material-symbols-outlined text-5xl text-outline-variant\">shopping_cart</span>" +
           "<strong class=\"mt-4 block text-xl font-headline font-extrabold text-on-surface\">Seu carrinho está vazio</strong>" +
           "<span class=\"mt-2 block text-sm text-on-surface-variant\">Volte ao cardápio para adicionar produtos e testar o fluxo completo da loja.</span>" +
-          "<a class=\"mt-5 inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-on-primary\" href=\"/cardapio.html\">Voltar ao cardápio</a>" +
+          "<a class=\"mt-5 inline-flex items-center justify-center rounded-full bg-[#f97316] px-5 py-3 text-sm font-bold text-white hover:bg-[#ea580c]\" href=\"/cardapio.html\">Voltar ao cardápio</a>" +
           "</div>";
         renderSummary([]);
         continueButton.disabled = true;
