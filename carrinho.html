@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Meu Carrinho | IzziMenu</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary-fixed-dim": "#ccd4ee",
+            "outline-variant": "#a9b4b9",
+            "error": "#9f403d",
+            "on-error-container": "#752121",
+            "on-primary-fixed": "#373f54",
+            "on-secondary-container": "#455367",
+            "on-secondary-fixed": "#324053",
+            "on-tertiary-fixed-variant": "#55536f",
+            "on-primary": "#f7f7ff",
+            "primary": "#565e74",
+            "secondary-dim": "#465468",
+            "on-tertiary": "#fcf7ff",
+            "on-tertiary-container": "#4b4a65",
+            "error-dim": "#4e0309",
+            "secondary-container": "#d5e3fc",
+            "surface-container-lowest": "#ffffff",
+            "surface-tint": "#565e74",
+            "error-container": "#fe8983",
+            "on-error": "#fff7f6",
+            "secondary-fixed-dim": "#c7d5ed",
+            "inverse-primary": "#dae2fd",
+            "surface": "#f7f9fb",
+            "surface-bright": "#f7f9fb",
+            "tertiary-dim": "#52506b",
+            "outline": "#717c82",
+            "on-tertiary-fixed": "#393751",
+            "primary-container": "#dae2fd",
+            "primary-fixed": "#dae2fd",
+            "on-primary-fixed-variant": "#535b71",
+            "surface-container-low": "#f0f4f7",
+            "tertiary-fixed": "#dad6f7",
+            "background": "#f7f9fb",
+            "surface-variant": "#d9e4ea",
+            "surface-container": "#e8eff3",
+            "on-surface": "#2a3439",
+            "on-background": "#2a3439",
+            "surface-container-high": "#e1e9ee",
+            "tertiary": "#5e5c78",
+            "inverse-surface": "#0b0f10",
+            "on-secondary": "#f8f8ff",
+            "surface-dim": "#cfdce3",
+            "inverse-on-surface": "#9a9d9f",
+            "tertiary-fixed-dim": "#ccc9e9",
+            "secondary-fixed": "#d5e3fc",
+            "secondary": "#526074",
+            "surface-container-highest": "#d9e4ea",
+            "primary-dim": "#4a5268",
+            "on-surface-variant": "#566166",
+            "on-secondary-fixed-variant": "#4e5c71",
+            "on-primary-container": "#4a5167",
+            "tertiary-container": "#dad6f7"
+          },
+          fontFamily: {
+            "headline": ["Manrope"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"}
+        }
+      }
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    .ambient-shadow { box-shadow: 0 12px 32px -4px rgba(42, 52, 57, 0.08); }
+  </style>
+  <link href="/assets/demo-experience.css" rel="stylesheet"/>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased izzimenu-demo-page izzimenu-demo-public">
+  <header class="sticky top-0 z-50 flex h-16 items-center justify-between bg-surface/85 px-6 backdrop-blur-md">
+    <button class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-container-low transition-colors" data-cart-nav="back" type="button">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="text-center">
+      <h1 class="font-headline text-lg font-extrabold tracking-tight">Meu carrinho</h1>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-on-surface-variant">Ajuste os itens antes do checkout</p>
+    </div>
+    <div class="w-10"></div>
+  </header>
+
+  <main class="mx-auto max-w-2xl px-6 pb-32 pt-6 space-y-6">
+    <section class="rounded-2xl bg-primary-container/35 p-5 ambient-shadow">
+      <div class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-primary">info</span>
+        <div>
+          <strong class="block font-headline text-base font-extrabold text-on-surface">Fluxo funcional da demo</strong>
+          <p class="mt-1 text-sm leading-relaxed text-on-surface-variant">Aqui você consegue aumentar, reduzir ou remover itens. O pagamento continua apenas ilustrativo na próxima etapa.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-4" data-demo-cart-items></section>
+
+    <section class="rounded-2xl bg-on-surface p-6 text-surface ambient-shadow" data-demo-cart-summary></section>
+  </main>
+
+  <div class="fixed bottom-0 left-0 z-50 w-full border-t border-outline-variant/10 bg-surface/88 p-6 backdrop-blur-xl">
+    <div class="mx-auto max-w-2xl">
+      <button class="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-primary text-base font-headline font-extrabold text-on-primary ambient-shadow transition-all active:scale-95" data-demo-cart-cta type="button">
+        <span>Ir para pagamento demo</span>
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+      <p class="mt-3 text-center text-[10px] font-medium text-on-surface-variant/70">A cobrança continua simulada para fins comerciais.</p>
+    </div>
+  </div>
+
+  <script defer src="/assets/demo-experience.js"></script>
+</body>
+</html>
