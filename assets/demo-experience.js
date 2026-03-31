@@ -5,6 +5,7 @@
 
   var currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
   var isAdmin = document.body.classList.contains("izzimenu-demo-admin");
+  var shouldRenderPublicNav = !isAdmin && currentPath === "/index.html";
   var adminAvatarSrc = "https://lh3.googleusercontent.com/aida-public/AB6AXuAscL_y2vZ2hK4zorKY6_xapfKox3G155xsLIbeYhMdAaHQcWwactA6tudZNao7Z_waNjqo32SVJzQbPz7wg7eVh4m0ECymWEfK5hYs05fXpkQn33b1pYksBo7a2be3Rj7cI2A6e_PPhsuLBiNKUlTifduULtob_R-SaTjq1swFNwzRbPbp5XNM2R42DeBS547xeu5G-1FjngJigt5ByZ_F0dsuyVYckCsgGG2QocW-MHHAuDvyvFXfGcAlXIxoNZ7N0N25zbAW7Q";
   var adminItems = [
     { href: "/admin/dashboard.html", label: "Visão Geral", icon: "dashboard" },
@@ -15,6 +16,7 @@
   ];
   var pages = [
     { href: "/cardapio.html", label: "Cardápio" },
+    { href: "/carrinho.html", label: "Carrinho" },
     { href: "/checkout.html", label: "Finalização" },
     { href: "/admin/dashboard.html", label: "Painel" },
     { href: "/admin/pedidos.html", label: "Pedidos" },
@@ -706,6 +708,93 @@
     }, 3200);
   }
 
+  function getWhatsAppHref(phone, text) {
+    var digits = String(phone || "").replace(/\D+/g, "");
+    if (!digits) {
+      return "#";
+    }
+
+    if (digits.indexOf("55") !== 0) {
+      digits = "55" + digits;
+    }
+
+    return "https://wa.me/" + digits + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+
+  function paginateItems(items, currentPage, pageSize) {
+    var totalPages = Math.max(1, Math.ceil(items.length / pageSize) || 1);
+    var safePage = Math.min(Math.max(currentPage || 1, 1), totalPages);
+    var startIndex = (safePage - 1) * pageSize;
+
+    return {
+      pageItems: items.slice(startIndex, startIndex + pageSize),
+      currentPage: safePage,
+      totalPages: totalPages,
+      totalItems: items.length
+    };
+  }
+
+  function buildPaginationMarkup(type, currentPage, totalPages) {
+    if (totalPages <= 1) {
+      return "";
+    }
+
+    var buttons = [];
+    for (var page = 1; page <= totalPages; page += 1) {
+      buttons.push(
+        "<button type=\"button\" class=\"izzimenu-demo-pagination__button" + (page === currentPage ? " is-active" : "") + "\" data-pagination-type=\"" + type + "\" data-page=\"" + page + "\">" + page + "</button>"
+      );
+    }
+
+    return (
+      "<div class=\"izzimenu-demo-pagination\">" +
+      "<button type=\"button\" class=\"izzimenu-demo-pagination__button\" data-pagination-type=\"" + type + "\" data-page=\"" + Math.max(currentPage - 1, 1) + "\" " + (currentPage === 1 ? "disabled" : "") + ">Anterior</button>" +
+      "<div class=\"izzimenu-demo-pagination__pages\">" + buttons.join("") + "</div>" +
+      "<button type=\"button\" class=\"izzimenu-demo-pagination__button\" data-pagination-type=\"" + type + "\" data-page=\"" + Math.min(currentPage + 1, totalPages) + "\" " + (currentPage === totalPages ? "disabled" : "") + ">Próxima</button>" +
+      "</div>"
+    );
+  }
+
+  function playNotificationTone() {
+    try {
+      var AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextConstructor) {
+        return;
+      }
+
+      var audioContext = new AudioContextConstructor();
+      if (audioContext.state === "suspended" && audioContext.resume) {
+        audioContext.resume();
+      }
+
+      [880, 1180].forEach(function (frequency, index) {
+        var oscillator = audioContext.createOscillator();
+        var gainNode = audioContext.createGain();
+        var startAt = audioContext.currentTime + index * 0.12;
+        var endAt = startAt + 0.14;
+
+        oscillator.type = "sine";
+        oscillator.frequency.value = frequency;
+        gainNode.gain.setValueAtTime(0.0001, startAt);
+        gainNode.gain.exponentialRampToValueAtTime(0.16, startAt + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, endAt);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.start(startAt);
+        oscillator.stop(endAt);
+      });
+
+      window.setTimeout(function () {
+        if (audioContext.close) {
+          audioContext.close();
+        }
+      }, 500);
+    } catch (error) {
+      return;
+    }
+  }
+
   function getShortTimestamp() {
     return "Hoje, " + new Intl.DateTimeFormat("pt-BR", {
       hour: "2-digit",
@@ -892,10 +981,6 @@
         vip: false,
         address: formData.address + (formData.reference ? " • " + formData.reference : ""),
         summary: "Cliente criado pela demo do checkout",
-        avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&q=80",
-        initials: (formData.name || "CD").split(" ").slice(0, 2).map(function (part) {
-          return part.charAt(0).toUpperCase();
-        }).join("").slice(0, 2),
         history: [
           { id: order.id, status: order.status, date: "Hoje", total: order.total }
         ]
@@ -1412,7 +1497,7 @@
 
   function getPaymentBadgeClass(order) {
     if (order.paymentTone === "pending") {
-      return "bg-surface-container-highest text-on-surface-variant";
+      return "bg-error-container/35 text-error";
     }
 
     return "bg-secondary-container text-on-secondary-container";
@@ -1440,10 +1525,16 @@
 
   function renderOrderRow(order, selectedOrderId) {
     var isSelected = selectedOrderId === order.id;
+    var isPendingOrder = normalize(order.status) === "novo";
+    var rowClass = isSelected
+      ? "bg-surface-container-low border-l-4 border-primary"
+      : isPendingOrder
+        ? "bg-error-container/10 border-l-4 border-error/40"
+        : "bg-surface-container-lowest";
     return (
-      "<div class=\"grid grid-cols-6 items-center px-6 py-5 " + (isSelected ? "bg-surface-container-low border-l-4 border-primary" : "bg-surface-container-lowest") + " hover:bg-surface-container-low transition-colors group cursor-pointer izzimenu-admin-order-row" + (isSelected ? " is-selected" : "") + "\" data-order-id=\"" + order.id + "\">" +
+      "<div class=\"grid grid-cols-6 items-center px-6 py-5 " + rowClass + " hover:bg-surface-container-low transition-colors group cursor-pointer izzimenu-admin-order-row" + (isSelected ? " is-selected" : "") + "\" data-order-id=\"" + order.id + "\">" +
       "<div class=\"col-span-2 flex items-center gap-4\">" +
-      "<div class=\"w-10 h-10 rounded " + (isSelected ? "bg-primary text-on-primary" : "bg-primary-container text-primary") + " flex items-center justify-center font-bold text-xs shadow-sm\">#" + order.id + "</div>" +
+      "<div class=\"w-10 h-10 rounded " + (isSelected ? "bg-primary text-on-primary" : isPendingOrder ? "bg-error-container text-error" : "bg-primary-container text-primary") + " flex items-center justify-center font-bold text-xs shadow-sm\">#" + order.id + "</div>" +
       "<div>" +
       "<p class=\"font-bold text-on-surface\">" + order.client + "</p>" +
       "<p class=\"text-xs text-on-surface-variant\">" + order.summary + "</p>" +
@@ -1569,16 +1660,30 @@
       return;
     }
 
+    var detailAside = Array.from(document.querySelectorAll("main aside")).find(function (element) {
+      return !element.classList.contains("izzimenu-admin-sidebar");
+    });
+
     var filtersBar = document.querySelector(".lg\\:col-span-3.bg-surface-container-low");
-    var filterButtons = filtersBar ? Array.from(filtersBar.querySelectorAll("button")) : [];
     if (filtersBar) {
+      var allButton = Array.from(filtersBar.querySelectorAll("button")).find(function (button) {
+        return getOrderFilterValue(button.textContent) === "todos";
+      });
+      if (allButton) {
+        filtersBar.appendChild(allButton);
+      }
       filtersBar.classList.add("izzimenu-demo-chip-cloud");
     }
+
+    var filterButtons = filtersBar ? Array.from(filtersBar.querySelectorAll("button")) : [];
     var selectedOrderId = null;
     var activeFilter = "todos";
     var activeQuery = "";
+    var currentPage = 1;
+    var pageSize = 15;
+    var alertBar = null;
 
-    function getFilteredOrders() {
+    function getSortedFilteredOrders() {
       return getDemoOrders()
         .slice()
         .sort(function (left, right) {
@@ -1605,21 +1710,105 @@
         });
     }
 
+    function getPagedOrders() {
+      var pagination = paginateItems(getSortedFilteredOrders(), currentPage, pageSize);
+      currentPage = pagination.currentPage;
+      return pagination;
+    }
+
+    function syncPageWithOrder(orderId) {
+      if (!orderId) {
+        return;
+      }
+
+      var orders = getSortedFilteredOrders();
+      var orderIndex = orders.findIndex(function (order) {
+        return order.id === orderId;
+      });
+
+      if (orderIndex !== -1) {
+        currentPage = Math.floor(orderIndex / pageSize) + 1;
+      }
+    }
+
+    function getPendingOrders() {
+      return getDemoOrders()
+        .slice()
+        .sort(function (left, right) {
+          return Number(right.id) - Number(left.id);
+        })
+        .filter(function (order) {
+          return normalize(order.status) === "novo";
+        });
+    }
+
+    function clearBottomAlert() {
+      if (alertBar) {
+        alertBar.remove();
+        alertBar = null;
+      }
+    }
+
+    function showBottomAlert(order) {
+      clearBottomAlert();
+      if (!order) {
+        return;
+      }
+
+      alertBar = document.createElement("div");
+      alertBar.className = "izzimenu-admin-order-alert";
+      alertBar.innerHTML =
+        "<div class=\"izzimenu-admin-order-alert__copy\">" +
+        "<strong>Novo pedido #" + order.id + " pronto para gerenciar</strong>" +
+        "<span>" + order.client + " entrou agora na fila demo. Toque para abrir o atendimento.</span>" +
+        "</div>" +
+        "<div class=\"izzimenu-admin-order-alert__actions\">" +
+        "<button type=\"button\" class=\"izzimenu-admin-order-alert__button\" data-order-alert-action=\"focus\">Gerenciar agora</button>" +
+        "<button type=\"button\" class=\"izzimenu-admin-order-alert__dismiss\" data-order-alert-action=\"close\" aria-label=\"Fechar alerta\"><span class=\"material-symbols-outlined\">close</span></button>" +
+        "</div>";
+      document.body.appendChild(alertBar);
+
+      alertBar.addEventListener("click", function (event) {
+        var action = event.target.closest("[data-order-alert-action]");
+        if (action && action.getAttribute("data-order-alert-action") === "close") {
+          clearBottomAlert();
+          return;
+        }
+
+        selectOrder(order.id);
+        clearBottomAlert();
+
+        if (detailAside) {
+          detailAside.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+      });
+    }
+
     function renderRows() {
-      var orders = getFilteredOrders();
+      var pagination = getPagedOrders();
+      var orders = pagination.pageItems;
+      var pendingOrders = getPendingOrders();
       var rowsMarkup = orders.map(function (order) {
         return renderOrderRow(order, selectedOrderId);
       }).join("");
+      var pendingBanner = pendingOrders.length
+        ? "<button type=\"button\" class=\"izzimenu-admin-pending-banner\" data-order-action=\"focus-pending\"><span class=\"material-symbols-outlined\">priority_high</span><div><strong>" + pendingOrders.length + " pedido(s) pendente(s)</strong><span>Pedidos novos aguardando ação. Clique para abrir o mais recente.</span></div></button>"
+        : "";
 
       listRoot.innerHTML =
+        pendingBanner +
         headerRow.outerHTML +
         rowsMarkup +
-        "<div class=\"izzimenu-admin-orders-empty\"" + (orders.length ? " hidden" : "") + ">" +
+        buildPaginationMarkup("orders", pagination.currentPage, pagination.totalPages) +
+        "<div class=\"izzimenu-admin-orders-empty\"" + (pagination.totalItems ? " hidden" : "") + ">" +
         "<strong>Nenhum pedido encontrado</strong>" +
         "<span>Tente buscar por número do pedido, cliente, status ou forma de entrega.</span>" +
         "</div>";
 
-      if (!orders.length) {
+      if (!pagination.totalItems) {
         renderOrderDetail(null);
         updateUrlParam("order", "");
       }
@@ -1641,21 +1830,19 @@
       }
 
       selectedOrderId = order.id;
+      syncPageWithOrder(order.id);
       renderRows();
       renderFilterState();
       renderOrderDetail(order);
       updateUrlParam("order", order.id);
     }
 
-    function applyOrderSearch(query) {
-      activeQuery = query.trim();
-      updateUrlParam("q", activeQuery);
-      renderRows();
-      renderFilterState();
-
-      var visibleOrders = getFilteredOrders();
+    function syncSelectionAfterListChange() {
+      var visibleOrders = getSortedFilteredOrders();
       if (!visibleOrders.length) {
         selectedOrderId = null;
+        renderOrderDetail(null);
+        updateUrlParam("order", "");
         return;
       }
 
@@ -1664,10 +1851,21 @@
       });
 
       if (!stillVisible) {
-        selectOrder(visibleOrders[0].id);
-      } else {
-        renderOrderDetail(getOrderById(selectedOrderId));
+        selectedOrderId = visibleOrders[0].id;
       }
+
+      syncPageWithOrder(selectedOrderId);
+      renderRows();
+      renderFilterState();
+      renderOrderDetail(getOrderById(selectedOrderId));
+      updateUrlParam("order", selectedOrderId);
+    }
+
+    function applyOrderSearch(query) {
+      activeQuery = query.trim();
+      currentPage = 1;
+      updateUrlParam("q", activeQuery);
+      syncSelectionAfterListChange();
     }
 
     function updateOrderStatus(orderId, nextStatus) {
@@ -1692,6 +1890,20 @@
     }
 
     listRoot.addEventListener("click", function (event) {
+      var paginationButton = event.target.closest('[data-pagination-type="orders"]');
+      if (paginationButton) {
+        currentPage = Number(paginationButton.getAttribute("data-page")) || 1;
+        var pagedOrders = getPagedOrders().pageItems;
+        if (pagedOrders.length && !pagedOrders.some(function (order) { return order.id === selectedOrderId; })) {
+          selectedOrderId = pagedOrders[0].id;
+        }
+        renderRows();
+        renderFilterState();
+        renderOrderDetail(getOrderById(selectedOrderId));
+        updateUrlParam("order", selectedOrderId || "");
+        return;
+      }
+
       var actionButton = event.target.closest("[data-order-action]");
       if (actionButton) {
         event.stopPropagation();
@@ -1702,16 +1914,20 @@
         return;
       }
 
+      if (actionButton && actionButton.getAttribute("data-order-action") === "focus-pending") {
+        var pendingOrder = getPendingOrders()[0];
+        if (pendingOrder) {
+          selectOrder(pendingOrder.id);
+        }
+        return;
+      }
+
       var row = event.target.closest("[data-order-id]");
       if (!row) {
         return;
       }
 
       selectOrder(row.getAttribute("data-order-id"));
-    });
-
-    var detailAside = Array.from(document.querySelectorAll("main aside")).find(function (element) {
-      return !element.classList.contains("izzimenu-admin-sidebar");
     });
 
     if (detailAside && !detailAside.dataset.bound) {
@@ -1746,7 +1962,7 @@
     filterButtons.forEach(function (button) {
       button.addEventListener("click", function () {
         activeFilter = getOrderFilterValue(button.textContent);
-        renderFilterState();
+        currentPage = 1;
         applyOrderSearch(activeQuery);
       });
     });
@@ -1776,18 +1992,12 @@
     selectedOrderId = urlState.searchParams.get("order") || null;
 
     renderFilterState();
-    renderRows();
-
-    var visibleOrders = getFilteredOrders();
-    if (!selectedOrderId && visibleOrders.length) {
-      selectedOrderId = visibleOrders[0].id;
-    }
-
-    if (selectedOrderId) {
-      selectOrder(selectedOrderId);
-    }
+    syncSelectionAfterListChange();
 
     if (urlState.searchParams.get("demoCreated") === "1") {
+      var createdOrder = getOrderById(selectedOrderId);
+      playNotificationTone();
+      showBottomAlert(createdOrder);
       showDemoToast("Pedido criado na demo", "O checkout simulou um novo pedido e o painel já refletiu essa entrada.", "success");
       updateUrlParam("demoCreated", "");
     }
@@ -1815,6 +2025,8 @@
     var selectedCustomerId = null;
     var activeSegment = "todos";
     var activeQuery = "";
+    var currentPage = 1;
+    var pageSize = 15;
 
     if (!tableBody || !sidebarColumn || !editorSection) {
       return;
@@ -1848,6 +2060,27 @@
       });
     }
 
+    function getPagedCustomers() {
+      var pagination = paginateItems(getFilteredCustomers(), currentPage, pageSize);
+      currentPage = pagination.currentPage;
+      return pagination;
+    }
+
+    function syncPageWithCustomer(customerId) {
+      if (!customerId) {
+        return;
+      }
+
+      var customers = getFilteredCustomers();
+      var customerIndex = customers.findIndex(function (customer) {
+        return customer.id === customerId;
+      });
+
+      if (customerIndex !== -1) {
+        currentPage = Math.floor(customerIndex / pageSize) + 1;
+      }
+    }
+
     function getCustomerBadgeClass(customer) {
       if (customer.segment === "recorrente") {
         return "bg-primary-container text-on-primary-container";
@@ -1872,17 +2105,20 @@
         "</td></tr>";
     }
 
+    function getCustomerPhoneMarkup(customer, compact) {
+      return "<a class=\"" + (compact ? "izzimenu-customer-phone is-compact" : "izzimenu-customer-phone") + "\" href=\"" + getWhatsAppHref(customer.phone, "Ola, " + customer.name + "! Vim pela demonstracao do IzziMenu.") + "\" target=\"_blank\" rel=\"noreferrer\" data-customer-whatsapp=\"true\">" + customer.phone + "</a>";
+    }
+
     function renderCustomerCard(customer, isSelected) {
       return (
         "<tr class=\"izzimenu-customer-card-row\" data-customer-id=\"" + customer.id + "\">" +
         "<td colspan=\"5\" class=\"p-0\">" +
-        "<button type=\"button\" class=\"izzimenu-customer-card" + (isSelected ? " is-selected" : "") + "\" data-customer-id=\"" + customer.id + "\">" +
+        "<div class=\"izzimenu-customer-card" + (isSelected ? " is-selected" : "") + "\" data-customer-id=\"" + customer.id + "\">" +
         "<div class=\"izzimenu-customer-card__top\">" +
-        "<div class=\"izzimenu-customer-card__identity\">" +
-        "<div class=\"izzimenu-customer-card__avatar\">" + customer.initials + "</div>" +
-        "<div>" +
+        "<div class=\"izzimenu-customer-card__identity is-compact\">" +
+        "<div class=\"izzimenu-customer-card__identity-copy\">" +
         "<strong>" + customer.name + "</strong>" +
-        "<span>" + customer.phone + "</span>" +
+        "<span>" + getCustomerPhoneMarkup(customer, true) + "</span>" +
         "</div>" +
         "</div>" +
         "<span class=\"izzimenu-customer-card__badge " + getCustomerBadgeClass(customer) + "\">" + customer.badgeLabel + "</span>" +
@@ -1893,17 +2129,18 @@
         "<div><span>Ultimo pedido</span><strong>" + customer.lastOrderLabel + "</strong></div>" +
         "</div>" +
         "<p class=\"izzimenu-customer-card__summary\">" + customer.summary + "</p>" +
-        "</button>" +
+        "</div>" +
         "</td>" +
         "</tr>"
       );
     }
 
     function renderCustomerTable() {
-      var customers = getFilteredCustomers();
+      var pagination = getPagedCustomers();
+      var customers = pagination.pageItems;
       var useCards = isCompactViewport();
 
-      if (!customers.length) {
+      if (!pagination.totalItems) {
         renderEmptyCustomerState();
         return;
       }
@@ -1925,9 +2162,9 @@
         return (
           "<tr class=\"" + (index % 2 ? "bg-surface-container-low/20 " : "") + "hover:bg-surface-container-low/50 transition-colors cursor-pointer" + (isSelected ? " bg-primary-container/20" : "") + "\" data-customer-id=\"" + customer.id + "\">" +
           "<td class=\"px-6 py-5\">" +
-          "<div class=\"flex items-center gap-3\">" +
-          "<div class=\"h-10 w-10 rounded-lg bg-secondary-container flex items-center justify-center text-secondary font-bold\">" + customer.initials + "</div>" +
-          "<div><p class=\"font-bold text-on-surface\">" + customer.name + "</p><p class=\"text-xs text-on-surface-variant\">" + customer.phone + "</p></div>" +
+          "<div class=\"min-w-0\">" +
+          "<p class=\"font-bold text-on-surface\">" + customer.name + "</p>" +
+          "<div class=\"text-xs text-on-surface-variant mt-1\">" + getCustomerPhoneMarkup(customer, false) + "</div>" +
           "</div>" +
           "</td>" +
           "<td class=\"px-6 py-5 font-semibold text-on-surface\">" + customer.ordersCount + "</td>" +
@@ -1936,7 +2173,10 @@
           "<td class=\"px-6 py-5\"><span class=\"px-3 py-1 text-[10px] font-black uppercase rounded-full " + getCustomerBadgeClass(customer) + "\">" + customer.badgeLabel + "</span></td>" +
           "</tr>"
         );
-      }).join("");
+      }).join("") +
+        (pagination.totalPages > 1
+          ? "<tr><td colspan=\"5\" class=\"px-6 py-5\">" + buildPaginationMarkup("customers", pagination.currentPage, pagination.totalPages) + "</td></tr>"
+          : "");
     }
 
     function renderCustomerSidebar(customer) {
@@ -1955,15 +2195,20 @@
         "<h3 class=\"text-lg font-bold\">Perfil do Cliente</h3>" +
         "<button class=\"text-on-surface-variant hover:text-on-surface\" type=\"button\" data-customer-action=\"open-orders\"><span class=\"material-symbols-outlined\">open_in_new</span></button>" +
         "</div>" +
-        "<div class=\"text-center mb-6\">" +
-        "<div class=\"h-20 w-20 rounded-full bg-white border-4 border-white shadow-sm mx-auto overflow-hidden\"><img alt=\"Cliente\" src=\"" + customer.avatar + "\" /></div>" +
-        "<h4 class=\"text-xl font-extrabold mt-3\">" + customer.name + "</h4>" +
-        "<span class=\"inline-block px-3 py-1 mt-1 " + (customer.vip ? "bg-tertiary text-on-tertiary" : "bg-surface-container-high text-on-surface") + " text-[10px] font-bold rounded uppercase\">" + (customer.vip ? "Cliente VIP" : "Base ativa") + "</span>" +
+        "<div class=\"mb-6\">" +
+        "<div class=\"flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between\">" +
+        "<div>" +
+        "<h4 class=\"text-xl font-extrabold\">" + customer.name + "</h4>" +
+        "<p class=\"text-sm text-on-surface-variant mt-1\">" + customer.summary + "</p>" +
+        "</div>" +
+        "<span class=\"inline-flex px-3 py-1 " + (customer.vip ? "bg-tertiary text-on-tertiary" : "bg-surface-container-high text-on-surface") + " text-[10px] font-bold rounded uppercase\">" + (customer.vip ? "Cliente VIP" : "Base ativa") + "</span>" +
+        "</div>" +
         "</div>" +
         "<div class=\"space-y-4 text-sm\">" +
+        "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">Telefone</span><span class=\"sm:text-right\">" + getCustomerPhoneMarkup(customer, false) + "</span></div>" +
+        "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">E-mail</span><span class=\"text-on-surface font-bold break-all sm:text-right\">" + customer.email + "</span></div>" +
         "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">Endereço principal</span><span class=\"text-on-surface font-bold sm:text-right\">" + customer.address + "</span></div>" +
         "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">Segmento</span><span class=\"text-on-surface font-bold\">" + customer.summary + "</span></div>" +
-        "<div class=\"flex flex-col gap-2 p-3 bg-white/50 rounded-lg sm:flex-row sm:justify-between sm:items-start\"><span class=\"text-on-surface-variant font-medium\">Contato</span><span class=\"text-on-surface font-bold break-all sm:text-right\">" + customer.email + "</span></div>" +
         "<div class=\"pt-4\">" +
         "<p class=\"text-xs font-bold uppercase text-on-surface-variant mb-3\">Historico de pedidos</p>" +
         "<div class=\"space-y-2\">" +
@@ -1984,6 +2229,13 @@
     }
 
     function selectCustomer(customerId) {
+      if (!customerId) {
+        selectedCustomerId = null;
+        renderCustomerTable();
+        renderCustomerSidebar(null);
+        return;
+      }
+
       var customer = getDemoCustomers().find(function (item) {
         return item.id === customerId;
       });
@@ -1993,11 +2245,30 @@
       }
 
       selectedCustomerId = customer.id;
+      syncPageWithCustomer(customer.id);
       renderCustomerTable();
       renderCustomerSidebar(customer);
     }
 
     tableBody.addEventListener("click", function (event) {
+      var pageButton = event.target.closest('[data-pagination-type="customers"]');
+      if (pageButton) {
+        currentPage = Number(pageButton.getAttribute("data-page")) || 1;
+        var pagedCustomers = getPagedCustomers().pageItems;
+        if (pagedCustomers.length && !pagedCustomers.some(function (customer) { return customer.id === selectedCustomerId; })) {
+          selectedCustomerId = pagedCustomers[0].id;
+        }
+        renderCustomerTable();
+        renderCustomerSidebar(getDemoCustomers().find(function (item) {
+          return item.id === selectedCustomerId;
+        }) || null);
+        return;
+      }
+
+      if (event.target.closest("[data-customer-whatsapp='true']")) {
+        return;
+      }
+
       var row = event.target.closest("[data-customer-id]");
       if (!row) {
         return;
@@ -2009,29 +2280,29 @@
     filterGroup.forEach(function (button) {
       button.addEventListener("click", function () {
         activeSegment = normalize(button.textContent);
+        currentPage = 1;
         filterGroup.forEach(function (item) {
           item.className = item === button
             ? "px-4 py-1.5 rounded-md bg-surface-container-lowest shadow-sm text-sm font-bold text-on-surface"
             : "px-4 py-1.5 rounded-md text-sm font-medium text-on-surface-variant hover:text-on-surface";
         });
-        renderCustomerTable();
-
         var visibleCustomers = getFilteredCustomers();
         if (!visibleCustomers.some(function (customer) { return customer.id === selectedCustomerId; })) {
-          selectCustomer(visibleCustomers[0] ? visibleCustomers[0].id : null);
+          selectedCustomerId = visibleCustomers[0] ? visibleCustomers[0].id : null;
         }
+        selectCustomer(selectedCustomerId);
       });
     });
 
     if (searchInput) {
       searchInput.addEventListener("input", function () {
         activeQuery = searchInput.value.trim();
-        renderCustomerTable();
-
+        currentPage = 1;
         var visibleCustomers = getFilteredCustomers();
         if (!visibleCustomers.some(function (customer) { return customer.id === selectedCustomerId; })) {
-          selectCustomer(visibleCustomers[0] ? visibleCustomers[0].id : null);
+          selectedCustomerId = visibleCustomers[0] ? visibleCustomers[0].id : null;
         }
+        selectCustomer(selectedCustomerId);
       });
     }
 
@@ -2896,6 +3167,7 @@
         cartTotal.textContent = formatMoney(totals.total);
       }
       if (cartButton) {
+        cartButton.textContent = "Meu carrinho";
         cartButton.disabled = !cartItems.length;
         cartButton.classList.toggle("opacity-60", !cartItems.length);
       }
@@ -2992,7 +3264,7 @@
           showDemoToast("Carrinho vazio", "Adicione pelo menos um item para avançar na demo.", "warning");
           return;
         }
-        window.location.href = "/checkout.html";
+        window.location.href = "/carrinho.html";
       });
     }
 
@@ -3017,7 +3289,7 @@
       }
       if (iconName === "receipt_long") {
         button.addEventListener("click", function () {
-          window.location.href = "/checkout.html";
+          window.location.href = "/carrinho.html";
         });
       }
     });
@@ -3026,16 +3298,139 @@
     applyMenuFilters();
   }
 
+  function setupCartDemo() {
+    if (currentPath !== "/carrinho.html") {
+      return;
+    }
+
+    var backButton = document.querySelector("[data-cart-nav='back']");
+    var itemsRoot = document.querySelector("[data-demo-cart-items]");
+    var summaryRoot = document.querySelector("[data-demo-cart-summary]");
+    var continueButton = document.querySelector("[data-demo-cart-cta]");
+
+    if (!itemsRoot || !summaryRoot || !continueButton) {
+      return;
+    }
+
+    function renderSummary(cartItems) {
+      var totals = getCartTotals(cartItems, "");
+      summaryRoot.innerHTML =
+        "<div class=\"space-y-3\">" +
+        "<div class=\"flex items-center justify-between text-sm text-on-surface-variant\"><span>Itens</span><strong class=\"text-on-surface\">" + cartItems.reduce(function (sum, item) { return sum + item.quantity; }, 0) + "</strong></div>" +
+        "<div class=\"flex items-center justify-between text-sm text-on-surface-variant\"><span>Subtotal</span><strong class=\"text-on-surface\">" + formatMoney(totals.subtotal) + "</strong></div>" +
+        "<div class=\"flex items-center justify-between text-sm text-on-surface-variant\"><span>Entrega estimada</span><strong class=\"text-on-surface\">" + formatDeliveryFee(totals.deliveryFee) + "</strong></div>" +
+        "<div class=\"pt-3 border-t border-outline-variant/10 flex items-center justify-between\"><span class=\"font-bold text-on-surface\">Total</span><strong class=\"text-xl font-black text-on-surface\">" + formatMoney(totals.total) + "</strong></div>" +
+        "<p class=\"text-xs text-on-surface-variant\">Pagamento continua em modo demo na próxima etapa, sem cobrança real.</p>" +
+        "</div>";
+    }
+
+    function renderCart() {
+      var cartItems = getDemoCart();
+
+      if (!cartItems.length) {
+        itemsRoot.innerHTML =
+          "<div class=\"rounded-2xl border border-dashed border-outline-variant/25 bg-surface-container-lowest p-8 text-center\">" +
+          "<span class=\"material-symbols-outlined text-5xl text-outline-variant\">shopping_cart</span>" +
+          "<strong class=\"mt-4 block text-xl font-headline font-extrabold text-on-surface\">Seu carrinho está vazio</strong>" +
+          "<span class=\"mt-2 block text-sm text-on-surface-variant\">Volte ao cardápio para adicionar produtos e testar o fluxo completo da loja.</span>" +
+          "<a class=\"mt-5 inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-bold text-on-primary\" href=\"/cardapio.html\">Voltar ao cardápio</a>" +
+          "</div>";
+        renderSummary([]);
+        continueButton.disabled = true;
+        continueButton.classList.add("opacity-60");
+        return;
+      }
+
+      itemsRoot.innerHTML = cartItems.map(function (item) {
+        return (
+          "<article class=\"rounded-2xl bg-surface-container-lowest p-4 shadow-[0_18px_32px_-28px_rgba(42,52,57,0.55)]\" data-cart-item=\"" + item.productId + "\">" +
+          "<div class=\"flex gap-4\">" +
+          (item.image ? "<img class=\"h-20 w-20 rounded-2xl object-cover\" src=\"" + escapeHtml(item.image) + "\" alt=\"" + escapeHtml(item.name) + "\" />" : "<div class=\"flex h-20 w-20 items-center justify-center rounded-2xl bg-surface-container\"><span class=\"material-symbols-outlined text-outline-variant\">lunch_dining</span></div>") +
+          "<div class=\"min-w-0 flex-1\">" +
+          "<div class=\"flex items-start justify-between gap-3\">" +
+          "<div class=\"min-w-0\"><h3 class=\"truncate text-lg font-extrabold text-on-surface\">" + escapeHtml(item.name) + "</h3><p class=\"mt-1 text-sm text-on-surface-variant\">" + escapeHtml(item.note || "Sem observações") + "</p></div>" +
+          "<button type=\"button\" class=\"rounded-full bg-error-container/18 p-2 text-error\" data-cart-action=\"remove\" data-product-id=\"" + item.productId + "\"><span class=\"material-symbols-outlined text-lg\">delete</span></button>" +
+          "</div>" +
+          "<div class=\"mt-4 flex items-center justify-between gap-3\">" +
+          "<strong class=\"text-base font-black text-on-surface\">" + formatMoney(item.price * item.quantity) + "</strong>" +
+          "<div class=\"flex items-center gap-2 rounded-full bg-surface-container px-2 py-1\">" +
+          "<button type=\"button\" class=\"flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-lowest text-on-surface\" data-cart-action=\"decrement\" data-product-id=\"" + item.productId + "\"><span class=\"material-symbols-outlined text-lg\">remove</span></button>" +
+          "<span class=\"min-w-[2rem] text-center text-sm font-bold text-on-surface\">" + item.quantity + "</span>" +
+          "<button type=\"button\" class=\"flex h-9 w-9 items-center justify-center rounded-full bg-primary text-on-primary\" data-cart-action=\"increment\" data-product-id=\"" + item.productId + "\"><span class=\"material-symbols-outlined text-lg\">add</span></button>" +
+          "</div>" +
+          "</div>" +
+          "</div>" +
+          "</div>" +
+          "</article>"
+        );
+      }).join("");
+
+      renderSummary(cartItems);
+      continueButton.disabled = false;
+      continueButton.classList.remove("opacity-60");
+    }
+
+    if (backButton) {
+      backButton.addEventListener("click", function () {
+        window.location.href = "/cardapio.html";
+      });
+    }
+
+    itemsRoot.addEventListener("click", function (event) {
+      var actionButton = event.target.closest("[data-cart-action]");
+      if (!actionButton) {
+        return;
+      }
+
+      var productId = actionButton.getAttribute("data-product-id");
+      var action = actionButton.getAttribute("data-cart-action");
+      var cartItems = getDemoCart();
+      var item = cartItems.find(function (entry) {
+        return entry.productId === productId;
+      });
+
+      if (!item) {
+        return;
+      }
+
+      if (action === "increment") {
+        item.quantity += 1;
+      }
+
+      if (action === "decrement") {
+        item.quantity -= 1;
+      }
+
+      if (action === "remove" || item.quantity <= 0) {
+        cartItems = cartItems.filter(function (entry) {
+          return entry.productId !== productId;
+        });
+      }
+
+      saveDemoCart(cartItems);
+      renderCart();
+    });
+
+    continueButton.addEventListener("click", function () {
+      if (!getDemoCart().length) {
+        showDemoToast("Carrinho vazio", "Adicione pelo menos um item antes de seguir para a etapa de pagamento demo.", "warning");
+        return;
+      }
+
+      window.location.href = "/checkout.html";
+    });
+
+    renderCart();
+  }
+
   function setupCheckoutDemo() {
     if (currentPath !== "/checkout.html") {
       return;
     }
 
     if (!getDemoCart().length) {
-      saveDemoCart([
-        { productId: "cheddar-master", name: "Cheddar Master", price: 38.9, quantity: 2, note: "Maionese defumada" },
-        { productId: "batata-crinkle", name: "Batata Crinkle Grande", price: 26.6, quantity: 1, note: "Cheddar e bacon" }
-      ]);
+      window.location.href = "/carrinho.html";
+      return;
     }
 
     var headerButtons = Array.from(document.querySelectorAll("header button"));
@@ -3082,7 +3477,7 @@
 
     if (backButton) {
       backButton.addEventListener("click", function () {
-        window.location.href = "/cardapio.html";
+        window.location.href = "/carrinho.html";
       });
     }
 
@@ -3169,6 +3564,7 @@
           href: "/admin/pedidos.html?order=" + orderId,
           unread: true
         });
+        playNotificationTone();
         clearDemoCart();
         window.location.href = "/admin/pedidos.html?order=" + orderId + "&demoCreated=1";
       });
@@ -3227,6 +3623,9 @@
     deliverySection.after(paymentsCard);
     paymentsCard.classList.add("izzimenu-config-payments-card");
     actionsCard.classList.add("izzimenu-config-actions-card");
+    if (actionsCard.parentElement) {
+      actionsCard.parentElement.classList.add("izzimenu-config-actions-rail");
+    }
 
     function getSectionByTab(tabLabel) {
       var key = normalize(tabLabel);
@@ -3858,8 +4257,12 @@
     syncSidebarState();
   }
 
+  if (!isAdmin && !shouldRenderPublicNav) {
+    document.body.classList.add("izzimenu-demo-public--compact");
+  }
+
   document.body.prepend(makeBanner());
-  if (!isAdmin) {
+  if (shouldRenderPublicNav) {
     document.body.prepend(makeNav());
   }
 
@@ -3882,6 +4285,7 @@
   }
 
   setupPublicCardapioDemo();
+  setupCartDemo();
   setupCheckoutDemo();
 
   patchAnchorByText(document.querySelector("aside"));
