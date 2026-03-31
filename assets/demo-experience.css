@@ -24,6 +24,10 @@ body.izzimenu-demo-public {
   padding-top: calc(var(--izzimenu-demo-banner-height) + var(--izzimenu-demo-nav-height));
 }
 
+body.izzimenu-demo-public.izzimenu-demo-public--compact {
+  padding-top: var(--izzimenu-demo-banner-height);
+}
+
 body.izzimenu-demo-admin {
   padding-top: var(--izzimenu-demo-banner-height);
 }
@@ -370,10 +374,16 @@ body.izzimenu-demo-admin .izzimenu-admin-topbar + * {
   margin-top: 0 !important;
 }
 
+.izzimenu-config-actions-rail {
+  align-self: start;
+}
+
 .izzimenu-config-actions-card {
   position: sticky !important;
-  top: calc(var(--izzimenu-demo-banner-height) + 3.25rem) !important;
+  top: calc(var(--izzimenu-demo-banner-height) + 0.9rem) !important;
   align-self: flex-start;
+  max-height: calc(100vh - var(--izzimenu-demo-banner-height) - 1.5rem);
+  overflow: auto;
 }
 
 .izzimenu-schedule-row {
@@ -635,6 +645,14 @@ body.izzimenu-demo-admin .izzimenu-admin-topbar + * {
   min-width: 0;
 }
 
+.izzimenu-customer-card__identity.is-compact {
+  display: block;
+}
+
+.izzimenu-customer-card__identity-copy {
+  min-width: 0;
+}
+
 .izzimenu-customer-card__avatar {
   display: inline-flex;
   align-items: center;
@@ -714,6 +732,169 @@ body.izzimenu-demo-admin .izzimenu-admin-topbar + * {
   color: #566166;
   font-size: 0.82rem;
   line-height: 1.45;
+}
+
+.izzimenu-customer-phone {
+  color: #566166;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.izzimenu-customer-phone:hover,
+.izzimenu-customer-phone:focus-visible {
+  color: var(--izzimenu-brand-orange-dark);
+}
+
+.izzimenu-customer-phone.is-compact {
+  font-size: 0.78rem;
+}
+
+.izzimenu-demo-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.izzimenu-demo-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.izzimenu-demo-pagination__button {
+  min-width: 2.45rem;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(169, 180, 185, 0.2);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #566166;
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.izzimenu-demo-pagination__button:hover:not(:disabled),
+.izzimenu-demo-pagination__button:focus-visible:not(:disabled) {
+  border-color: rgba(249, 115, 22, 0.3);
+  color: var(--izzimenu-brand-orange-dark);
+}
+
+.izzimenu-demo-pagination__button.is-active {
+  background: var(--izzimenu-brand-orange);
+  border-color: var(--izzimenu-brand-orange);
+  color: #ffffff;
+}
+
+.izzimenu-demo-pagination__button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.izzimenu-admin-pending-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(220, 38, 38, 0.14);
+  border-radius: 1rem;
+  background: rgba(254, 226, 226, 0.7);
+  color: #7f1d1d;
+  text-align: left;
+}
+
+.izzimenu-admin-pending-banner .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+.izzimenu-admin-pending-banner strong {
+  display: block;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.izzimenu-admin-pending-banner span:last-child {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: rgba(127, 29, 29, 0.86);
+}
+
+.izzimenu-admin-order-alert {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1350;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(31rem, calc(100vw - 2rem));
+  padding: 1rem 1rem 1rem 1.1rem;
+  border: 1px solid rgba(220, 38, 38, 0.14);
+  border-radius: 1.25rem;
+  background: rgba(254, 242, 242, 0.98);
+  box-shadow: 0 22px 40px -26px rgba(127, 29, 29, 0.35);
+}
+
+.izzimenu-admin-order-alert__copy {
+  min-width: 0;
+}
+
+.izzimenu-admin-order-alert__copy strong {
+  display: block;
+  color: #7f1d1d;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.96rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.izzimenu-admin-order-alert__copy span {
+  display: block;
+  margin-top: 0.25rem;
+  color: #7f1d1d;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  opacity: 0.88;
+}
+
+.izzimenu-admin-order-alert__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.izzimenu-admin-order-alert__button {
+  min-height: 2.7rem;
+  padding: 0.72rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--izzimenu-brand-orange);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.izzimenu-admin-order-alert__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
 }
 
 .izzimenu-admin-store-btn {
@@ -1293,6 +1474,10 @@ body.izzimenu-demo-public .sticky.top-0 {
   top: calc(var(--izzimenu-demo-banner-height) + var(--izzimenu-demo-nav-height)) !important;
 }
 
+body.izzimenu-demo-public.izzimenu-demo-public--compact .sticky.top-0 {
+  top: var(--izzimenu-demo-banner-height) !important;
+}
+
 body.izzimenu-demo-admin aside.fixed {
   top: var(--izzimenu-demo-banner-height) !important;
   height: calc(100vh - var(--izzimenu-demo-banner-height)) !important;
@@ -1434,6 +1619,8 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
   .izzimenu-config-actions-card {
     position: static !important;
     top: auto !important;
+    max-height: none;
+    overflow: visible;
   }
 
   .izzimenu-schedule-row {
@@ -1468,6 +1655,24 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
   body.izzimenu-demo-admin .izzimenu-admin-content--default,
   body.izzimenu-demo-admin .izzimenu-admin-content--roomy {
     padding: 1rem 1rem 5rem;
+  }
+
+  .izzimenu-admin-order-alert {
+    right: 0.75rem;
+    left: 0.75rem;
+    bottom: 4.85rem;
+    width: auto;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .izzimenu-admin-order-alert__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .izzimenu-admin-order-alert__button {
+    flex: 1;
   }
 }
 
