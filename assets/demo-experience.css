@@ -366,6 +366,73 @@ body.izzimenu-demo-admin .izzimenu-admin-topbar + * {
   gap: 0.5rem;
 }
 
+.izzimenu-config-payments-card {
+  margin-top: 0 !important;
+}
+
+.izzimenu-config-actions-card {
+  position: sticky !important;
+  top: calc(var(--izzimenu-demo-banner-height) + 3.25rem) !important;
+  align-self: flex-start;
+}
+
+.izzimenu-schedule-row {
+  display: grid;
+  grid-template-columns: minmax(9.5rem, 10.5rem) minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.9rem;
+}
+
+.izzimenu-schedule-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.izzimenu-schedule-times {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.izzimenu-schedule-times input[type="time"] {
+  width: 5.75rem;
+  min-width: 5.75rem;
+}
+
+.izzimenu-schedule-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.izzimenu-schedule-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.izzimenu-schedule-remove:hover,
+.izzimenu-schedule-remove:focus-visible {
+  background: rgba(220, 38, 38, 0.18);
+  color: #b91c1c;
+  transform: translateY(-1px);
+}
+
 .izzimenu-demo-editor-focus {
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18), 0 24px 44px -34px rgba(249, 115, 22, 0.55);
   transition: box-shadow 180ms ease;
@@ -1362,6 +1429,24 @@ body.izzimenu-demo-admin nav.fixed.bottom-0 {
 
   .izzimenu-option-row {
     grid-template-columns: 1fr;
+  }
+
+  .izzimenu-config-actions-card {
+    position: static !important;
+    top: auto !important;
+  }
+
+  .izzimenu-schedule-row {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .izzimenu-schedule-times {
+    flex-wrap: nowrap;
+  }
+
+  .izzimenu-schedule-controls {
+    justify-content: space-between;
   }
 
   .izzimenu-catalog-mobile-card__actions {
