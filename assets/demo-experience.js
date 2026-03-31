@@ -3206,11 +3206,13 @@
       return ["dados da loja", "horarios", "entrega", "pagamentos"].indexOf(normalize(button.textContent)) !== -1;
     }).slice(0, 4);
     var tabsContainer = tabButtons[0] ? tabButtons[0].parentElement : null;
+    var hoursHeader = hoursSection ? hoursSection.querySelector(".flex.items-center.justify-between") : null;
+    var hoursList = hoursSection ? hoursSection.querySelector(".space-y-3") : null;
     var savedSettings = getDemoSettings();
     var draftSettings = cloneData(savedSettings);
     var activeTab = "dados da loja";
 
-    if (!main || !storeSection || !hoursSection || !deliverySection || !paymentsCard || !actionsCard || !statusCard) {
+    if (!main || !storeSection || !hoursSection || !hoursHeader || !hoursList || !deliverySection || !paymentsCard || !actionsCard || !statusCard) {
       return;
     }
 
@@ -3270,47 +3272,62 @@
       }
     }
 
+    function createScheduleDraft() {
+      return {
+        id: "custom-schedule-" + Date.now(),
+        label: "Novo horario",
+        opensAt: "08:00",
+        closesAt: "18:00",
+        enabled: true
+      };
+    }
+
+    function ensureHoursAddButton() {
+      var addButton = hoursHeader.querySelector("[data-schedule-action='add']");
+      if (addButton) {
+        return addButton;
+      }
+
+      addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.setAttribute("data-schedule-action", "add");
+      addButton.className = "inline-flex items-center justify-center gap-2 h-10 px-3 rounded-full bg-primary/10 text-primary font-bold text-sm hover:bg-primary/15 transition-colors";
+      addButton.innerHTML = "<span class=\"material-symbols-outlined text-lg\">add</span><span class=\"hidden sm:inline\">Novo horario</span>";
+      hoursHeader.appendChild(addButton);
+      return addButton;
+    }
+
+    function renderScheduleRow(schedule, index) {
+      var isEnabled = !!schedule.enabled;
+      var canRemove = draftSettings.hours.length > 1;
+
+      return (
+        "<div class=\"flex flex-wrap items-center justify-between gap-4 p-4 rounded-lg group " + (isEnabled ? "bg-surface-container-lowest" : "bg-surface-container-high/50 opacity-60") + "\" data-schedule-row=\"" + index + "\">" +
+        "<div class=\"flex items-center gap-3 min-w-[11rem] flex-1 sm:flex-none sm:w-40\">" +
+        "<div class=\"w-3 h-3 rounded-full " + (isEnabled ? "bg-primary" : "bg-outline-variant") + "\"></div>" +
+        "<input type=\"text\" value=\"" + escapeHtml(schedule.label) + "\" placeholder=\"Novo horario\" data-schedule-field=\"label\" data-schedule-index=\"" + index + "\" class=\"w-full bg-transparent border-none rounded px-0 py-1 text-sm font-bold text-on-surface focus:ring-0 placeholder:text-on-surface-variant\" />" +
+        "</div>" +
+        "<div class=\"flex items-center gap-3 flex-1 justify-start min-w-[14rem]\">" +
+        "<input class=\"bg-surface-container border-none rounded px-2 py-1 text-sm font-medium focus:ring-primary/20\" type=\"time\" value=\"" + escapeHtml(schedule.opensAt) + "\" data-schedule-field=\"opensAt\" data-schedule-index=\"" + index + "\"" + (isEnabled ? "" : " disabled") + " />" +
+        "<span class=\"text-outline-variant\">as</span>" +
+        "<input class=\"bg-surface-container border-none rounded px-2 py-1 text-sm font-medium focus:ring-primary/20\" type=\"time\" value=\"" + escapeHtml(schedule.closesAt) + "\" data-schedule-field=\"closesAt\" data-schedule-index=\"" + index + "\"" + (isEnabled ? "" : " disabled") + " />" +
+        "</div>" +
+        "<div class=\"flex items-center gap-3 ml-auto\">" +
+        (canRemove ? "<button type=\"button\" data-schedule-action=\"remove\" data-schedule-index=\"" + index + "\" class=\"inline-flex items-center justify-center w-9 h-9 rounded-full bg-surface-container text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors\" title=\"Excluir horario\"><span class=\"material-symbols-outlined text-base\">delete</span></button>" : "") +
+        "<span class=\"text-[10px] font-black uppercase " + (isEnabled ? "text-primary" : "text-on-surface-variant") + "\">" + (isEnabled ? "Aberto" : "Fechado") + "</span>" +
+        "<button type=\"button\" data-schedule-toggle=\"true\" data-schedule-index=\"" + index + "\" class=\"w-10 h-5 rounded-full relative cursor-pointer transition-colors " + (isEnabled ? "bg-primary/20" : "bg-outline-variant/20") + "\" aria-label=\"" + (isEnabled ? "Fechar horario" : "Abrir horario") + "\">" +
+        "<div class=\"absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all " + (isEnabled ? "right-0.5 bg-primary" : "left-0.5 bg-outline-variant") + "\"></div>" +
+        "</button>" +
+        "</div>" +
+        "</div>"
+      );
+    }
+
     function renderHoursSection() {
-      Array.from(hoursSection.querySelectorAll(".group")).forEach(function (row, index) {
-        var schedule = draftSettings.hours[index];
-        if (!schedule) {
-          return;
-        }
-
-        var times = row.querySelectorAll("input[type='time']");
-        var statusLabel = Array.from(row.querySelectorAll("span")).find(function (element) {
-          return /uppercase/.test(element.className) && /font-black/.test(element.className);
-        });
-        var toggle = Array.from(row.querySelectorAll("div")).find(function (element) {
-          return /w-10/.test(element.className) && /h-5/.test(element.className) && /rounded-full/.test(element.className);
-        });
-        var dayLabel = row.querySelector(".font-bold.text-sm");
-
-        if (dayLabel) {
-          dayLabel.textContent = schedule.label;
-        }
-        if (times[0]) {
-          times[0].value = schedule.opensAt;
-          times[0].disabled = !schedule.enabled;
-        }
-        if (times[1]) {
-          times[1].value = schedule.closesAt;
-          times[1].disabled = !schedule.enabled;
-        }
-        if (statusLabel) {
-          statusLabel.textContent = schedule.enabled ? "Aberto" : "Fechado";
-          statusLabel.className = "text-[10px] font-black uppercase " + (schedule.enabled ? "text-primary" : "text-on-surface-variant");
-        }
-        row.className = "flex flex-wrap items-center justify-between p-4 rounded-lg group " + (schedule.enabled ? "bg-surface-container-lowest" : "bg-surface-container-high/50 opacity-60");
-
-        if (toggle) {
-          toggle.dataset.scheduleIndex = String(index);
-          toggle.setAttribute("role", "button");
-          toggle.setAttribute("tabindex", "0");
-          toggle.className = "w-10 h-5 rounded-full relative cursor-pointer transition-colors " + (schedule.enabled ? "bg-primary/20" : "bg-outline-variant/20");
-          toggle.innerHTML = "<div class=\"absolute top-0.5 w-4 h-4 rounded-full shadow-sm transition-all " + (schedule.enabled ? "right-0.5 bg-primary" : "left-0.5 bg-outline-variant") + "\"></div>";
-        }
-      });
+      ensureHoursAddButton();
+      hoursList.innerHTML = draftSettings.hours.map(function (schedule, index) {
+        return renderScheduleRow(schedule, index);
+      }).join("");
     }
 
     function renderDeliverySection() {
@@ -3478,20 +3495,79 @@
       brandingTrigger.dataset.bound = "true";
     }
 
-    Array.from(hoursSection.querySelectorAll("input[type='time']")).forEach(function (input) {
-      input.addEventListener("change", function () {
-        var row = this.closest(".group");
-        var rowIndex = Array.from(hoursSection.querySelectorAll(".group")).indexOf(row);
-        var times = row.querySelectorAll("input[type='time']");
-        if (draftSettings.hours[rowIndex]) {
-          draftSettings.hours[rowIndex].opensAt = times[0] ? times[0].value : draftSettings.hours[rowIndex].opensAt;
-          draftSettings.hours[rowIndex].closesAt = times[1] ? times[1].value : draftSettings.hours[rowIndex].closesAt;
-        }
-      });
+    hoursSection.addEventListener("input", function (event) {
+      var field = event.target.closest("[data-schedule-field]");
+      if (!field) {
+        return;
+      }
+
+      var rowIndex = Number(field.getAttribute("data-schedule-index"));
+      var schedule = draftSettings.hours[rowIndex];
+      if (!schedule) {
+        return;
+      }
+
+      var fieldName = field.getAttribute("data-schedule-field");
+      if (fieldName === "label") {
+        schedule.label = field.value;
+        return;
+      }
+
+      if (fieldName === "opensAt" || fieldName === "closesAt") {
+        schedule[fieldName] = field.value || schedule[fieldName];
+      }
+    });
+
+    hoursSection.addEventListener("change", function (event) {
+      var field = event.target.closest("[data-schedule-field]");
+      if (!field) {
+        return;
+      }
+
+      var rowIndex = Number(field.getAttribute("data-schedule-index"));
+      var schedule = draftSettings.hours[rowIndex];
+      if (!schedule) {
+        return;
+      }
+
+      if (field.getAttribute("data-schedule-field") === "label") {
+        schedule.label = field.value.trim() || ("Horario " + (rowIndex + 1));
+        renderHoursSection();
+      }
     });
 
     hoursSection.addEventListener("click", function (event) {
-      var toggle = event.target.closest("[data-schedule-index]");
+      var addButton = event.target.closest("[data-schedule-action='add']");
+      if (addButton) {
+        draftSettings.hours.push(createScheduleDraft());
+        renderHoursSection();
+        renderStatusCard();
+        window.setTimeout(function () {
+          var lastInput = hoursList.querySelector("[data-schedule-field='label'][data-schedule-index='" + (draftSettings.hours.length - 1) + "']");
+          if (lastInput) {
+            lastInput.focus();
+            lastInput.select();
+          }
+        }, 0);
+        showDemoToast("Horario criado", "Adicione um novo bloco de atendimento para a loja demo.", "success");
+        return;
+      }
+
+      var removeButton = event.target.closest("[data-schedule-action='remove']");
+      if (removeButton) {
+        if (draftSettings.hours.length <= 1) {
+          showDemoToast("Ultimo horario", "Mantenha pelo menos um bloco de horario na demonstracao.", "warning");
+          return;
+        }
+
+        draftSettings.hours.splice(Number(removeButton.getAttribute("data-schedule-index")), 1);
+        renderHoursSection();
+        renderStatusCard();
+        showDemoToast("Horario removido", "O bloco selecionado saiu do rascunho atual da demo.", "warning");
+        return;
+      }
+
+      var toggle = event.target.closest("[data-schedule-toggle='true']");
       if (!toggle) {
         return;
       }
